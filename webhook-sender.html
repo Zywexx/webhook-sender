@@ -1,0 +1,1888 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>787 Webhook Gönderici</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Discord tarzı koyu tema */
+            --bg-primary: #1e1f29;
+            --bg-secondary: #2a2b36;
+            --bg-tertiary: #363843;
+            --bg-card: #2f303d;
+            --bg-input: #252631;
+            --text-primary: #ffffff;
+            --text-secondary: #b9bbbe;
+            --text-muted: #8a8d93;
+            --accent: #5865f2;
+            --accent-hover: #4752c4;
+            --success: #57f287;
+            --warning: #faa81a;
+            --error: #ed4245;
+            --border: #40424e;
+            --shadow: rgba(0, 0, 0, 0.2);
+            --radius: 8px;
+            --transition: all 0.2s ease;
+        }
+
+        [data-theme="light"] {
+            /* Light tema */
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e9ecef;
+            --bg-card: #ffffff;
+            --bg-input: #f1f3f5;
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --text-muted: #6c757d;
+            --accent: #5865f2;
+            --accent-hover: #4752c4;
+            --success: #28a745;
+            --warning: #ffc107;
+            --error: #dc3545;
+            --border: #dee2e6;
+            --shadow: rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: var(--transition);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            gap: 20px;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background-color: var(--bg-secondary);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: 0 4px 12px var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo i {
+            font-size: 1.8rem;
+        }
+
+        .section-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            font-size: 0.8rem;
+        }
+
+        .webhook-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .webhook-item {
+            background-color: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 12px 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid transparent;
+            position: relative;
+        }
+
+        .webhook-item:hover {
+            background-color: var(--bg-tertiary);
+            transform: translateY(-2px);
+        }
+
+        .webhook-item.active {
+            border-color: var(--accent);
+            background-color: rgba(88, 101, 242, 0.1);
+        }
+
+        .webhook-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .webhook-url {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border-radius: var(--radius);
+            border: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--border);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-error {
+            background-color: var(--error);
+            color: white;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        .btn-icon {
+            padding: 8px;
+            width: 36px;
+            height: 36px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(88, 101, 242, 0.2);
+        }
+
+        /* Main Content */
+        .main-content {
+            background-color: var(--bg-secondary);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: 0 4px 12px var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .tab-container {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            border-bottom: 3px solid transparent;
+            position: relative;
+        }
+
+        .tab:hover {
+            color: var(--text-primary);
+        }
+
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: 0 2px 8px var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .link-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding-right: 5px;
+        }
+
+        .link-item {
+            background-color: var(--bg-tertiary);
+            border-radius: var(--radius);
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .link-item:hover {
+            background-color: var(--border);
+        }
+
+        .link-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .link-preview {
+            width: 60px;
+            height: 60px;
+            border-radius: 4px;
+            object-fit: cover;
+            background-color: var(--bg-input);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+        }
+
+        .link-details {
+            flex: 1;
+        }
+
+        .link-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+        }
+
+        .link-url {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .link-type {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background-color: var(--accent);
+            color: white;
+            font-weight: 600;
+        }
+
+        .dropzone {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background-color: var(--bg-input);
+        }
+
+        .dropzone:hover, .dropzone.dragover {
+            border-color: var(--accent);
+            background-color: rgba(88, 101, 242, 0.05);
+        }
+
+        .dropzone i {
+            font-size: 2.5rem;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .file-item {
+            background-color: var(--bg-tertiary);
+            border-radius: var(--radius);
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition);
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .file-icon {
+            font-size: 1.2rem;
+            color: var(--accent);
+        }
+
+        .file-details {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .file-size {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: var(--bg-input);
+            border-radius: 3px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--accent);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        /* Log Panel */
+        .log-panel {
+            background-color: var(--bg-secondary);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: 0 4px 12px var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .log-list {
+            flex: 1;
+            overflow-y: auto;
+            background-color: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .log-entry {
+            padding: 8px 10px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-10px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .log-success {
+            background-color: rgba(87, 242, 135, 0.1);
+            border-left: 3px solid var(--success);
+            color: var(--success);
+        }
+
+        .log-error {
+            background-color: rgba(237, 66, 69, 0.1);
+            border-left: 3px solid var(--error);
+            color: var(--error);
+        }
+
+        .log-info {
+            background-color: rgba(88, 101, 242, 0.1);
+            border-left: 3px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .log-warning {
+            background-color: rgba(250, 168, 26, 0.1);
+            border-left: 3px solid var(--warning);
+            color: var(--warning);
+        }
+
+        .log-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-right: 10px;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            background-color: var(--bg-card);
+            border-radius: var(--radius);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-tertiary);
+            transition: var(--transition);
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: var(--transition);
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--accent);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: var(--radius);
+            background-color: var(--bg-card);
+            color: var(--text-primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            animation: slideUp 0.3s ease;
+            transform: translateY(0);
+            max-width: 300px;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .notification.hide {
+            animation: slideDown 0.3s ease;
+            transform: translateY(100px);
+            opacity: 0;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(0); opacity: 1; }
+            to { transform: translateY(100px); opacity: 0; }
+        }
+
+        .notification-success {
+            border-left: 4px solid var(--success);
+        }
+
+        .notification-error {
+            border-left: 4px solid var(--error);
+        }
+
+        .notification-warning {
+            border-left: 4px solid var(--warning);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 5px;
+            background-color: var(--bg-input);
+            border-radius: var(--radius);
+            padding: 5px;
+            margin-bottom: 15px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 8px 12px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .mode-btn.active {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        /* Mobil Uyumluluk */
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+                height: auto;
+            }
+            
+            .sidebar, .main-content, .log-panel {
+                min-height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+                gap: 10px;
+            }
+            
+            .link-info, .file-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .tab-container {
+                overflow-x: auto;
+            }
+            
+            .tab {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+                white-space: nowrap;
+            }
+        }
+
+        /* Scrollbar Stili */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <!-- Tema Değiştirme Butonu -->
+    <div class="theme-toggle">
+        <label class="toggle-switch">
+            <input type="checkbox" id="themeToggle">
+            <span class="toggle-slider"></span>
+        </label>
+    </div>
+
+    <div class="container">
+        <!-- Sidebar - Webhook Yönetimi -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-paper-plane"></i>
+                <span>787 Webhook Gönderici</span>
+            </div>
+            
+            <div>
+                <div class="section-title">
+                    <i class="fas fa-link"></i>
+                    <span>Webhook Yönetimi</span>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Webhook URL</label>
+                    <input type="text" class="input-field" id="webhookUrl" placeholder="https://discord.com/api/webhooks/...">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Webhook Adı (Opsiyonel)</label>
+                    <input type="text" class="input-field" id="webhookName" placeholder="Sunucu İsmi">
+                </div>
+                
+                <button class="btn btn-primary" id="addWebhookBtn">
+                    <i class="fas fa-plus"></i>
+                    <span>Webhook Ekle</span>
+                </button>
+                
+                <div class="section-title">
+                    <i class="fas fa-list"></i>
+                    <span>Kayıtlı Webhook'lar</span>
+                </div>
+                
+                <div class="webhook-list" id="webhookList">
+                    <!-- Webhook'lar buraya eklenecek -->
+                </div>
+                
+                <div class="toggle-container">
+                    <span>Proxy Kullan</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="proxyToggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div id="proxyContainer" style="display: none;">
+                    <div class="input-group">
+                        <label class="input-label">Proxy URL</label>
+                        <input type="text" class="input-field" id="proxyUrl" placeholder="http://proxy.example.com:8080">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-secondary" id="testWebhookBtn">
+                    <i class="fas fa-vial"></i>
+                    <span>Test Et</span>
+                </button>
+                <button class="btn btn-secondary" id="clearStorageBtn">
+                    <i class="fas fa-trash"></i>
+                    <span>Temizle</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Main Content - Link ve Dosya Gönderimi -->
+        <div class="main-content">
+            <div class="tab-container">
+                <div class="tab active" data-tab="links">
+                    <i class="fas fa-link"></i>
+                    <span>Link Gönder</span>
+                </div>
+                <div class="tab" data-tab="files">
+                    <i class="fas fa-file-upload"></i>
+                    <span>Dosya Gönder</span>
+                </div>
+                <div class="tab" data-tab="history">
+                    <i class="fas fa-history"></i>
+                    <span>Geçmiş</span>
+                </div>
+            </div>
+            
+            <!-- Link Gönderimi Tab -->
+            <div class="tab-content active" id="linksTab">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Yeni Link Ekle</span>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Link URL'si</label>
+                        <input type="text" class="input-field" id="linkUrl" placeholder="https://example.com/...">
+                    </div>
+                    
+                    <button class="btn btn-primary" id="addLinkBtn">
+                        <i class="fas fa-plus"></i>
+                        <span>Listeye Ekle</span>
+                    </button>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-list"></i>
+                        <span>Link Listesi</span>
+                        <span class="link-type" id="linkCount">0 link</span>
+                    </div>
+                    
+                    <div class="mode-selector">
+                        <div class="mode-btn active" data-mode="single">Tekli Gönderim</div>
+                        <div class="mode-btn" data-mode="batch">Toplu Gönderim</div>
+                    </div>
+                    
+                    <div class="link-list" id="linkList">
+                        <!-- Linkler buraya eklenecek -->
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-success" id="sendLinksBtn">
+                            <i class="fas fa-paper-plane"></i>
+                            <span>Linkleri Gönder</span>
+                        </button>
+                        <button class="btn btn-error" id="clearLinksBtn">
+                            <i class="fas fa-trash"></i>
+                            <span>Listeyi Temizle</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dosya Gönderimi Tab -->
+            <div class="tab-content" id="filesTab">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Dosya Yükle</span>
+                    </div>
+                    
+                    <div class="dropzone" id="dropzone">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h3>Dosyaları sürükleyip bırakın veya tıklayarak seçin</h3>
+                        <p>Maksimum dosya boyutu: 25MB</p>
+                        <p>Desteklenen formatlar: Resim, Video, PDF, ZIP</p>
+                    </div>
+                    
+                    <input type="file" id="fileInput" multiple style="display: none;">
+                    
+                    <div class="mode-selector">
+                        <div class="mode-btn active" data-mode="single">Tekli Gönderim</div>
+                        <div class="mode-btn" data-mode="batch">Toplu Gönderim</div>
+                    </div>
+                    
+                    <div class="file-list" id="fileList">
+                        <!-- Dosyalar buraya eklenecek -->
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-success" id="sendFilesBtn">
+                            <i class="fas fa-paper-plane"></i>
+                            <span>Dosyaları Gönder</span>
+                        </button>
+                        <button class="btn btn-error" id="clearFilesBtn">
+                            <i class="fas fa-trash"></i>
+                            <span>Tümünü Kaldır</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Geçmiş Tab -->
+            <div class="tab-content" id="historyTab">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-history"></i>
+                        <span>Gönderim Geçmişi</span>
+                    </div>
+                    
+                    <div id="historyList">
+                        <!-- Geçmiş buraya eklenecek -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Log Panel -->
+        <div class="log-panel">
+            <div class="log-header">
+                <div class="card-title">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>İşlem Logları</span>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-icon btn-secondary" id="downloadLogsBtn" title="Logları İndir">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="btn btn-icon btn-secondary" id="clearLogsBtn" title="Logları Temizle">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="log-list" id="logList">
+                <!-- Loglar buraya eklenecek -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Bildirimler -->
+    <div id="notificationContainer"></div>
+
+    <script>
+        // Uygulama durumu
+        const state = {
+            webhooks: JSON.parse(localStorage.getItem('webhooks')) || [],
+            activeWebhook: null,
+            links: JSON.parse(localStorage.getItem('links')) || [],
+            files: [],
+            logs: JSON.parse(localStorage.getItem('logs')) || [],
+            history: JSON.parse(localStorage.getItem('history')) || [],
+            proxyEnabled: false,
+            sendMode: 'single' // 'single' veya 'batch'
+        };
+
+        // DOM Elementleri
+        const dom = {
+            // Webhook yönetimi
+            webhookUrl: document.getElementById('webhookUrl'),
+            webhookName: document.getElementById('webhookName'),
+            addWebhookBtn: document.getElementById('addWebhookBtn'),
+            webhookList: document.getElementById('webhookList'),
+            testWebhookBtn: document.getElementById('testWebhookBtn'),
+            clearStorageBtn: document.getElementById('clearStorageBtn'),
+            
+            // Proxy
+            proxyToggle: document.getElementById('proxyToggle'),
+            proxyContainer: document.getElementById('proxyContainer'),
+            proxyUrl: document.getElementById('proxyUrl'),
+            
+            // Link yönetimi
+            linkUrl: document.getElementById('linkUrl'),
+            addLinkBtn: document.getElementById('addLinkBtn'),
+            linkList: document.getElementById('linkList'),
+            linkCount: document.getElementById('linkCount'),
+            sendLinksBtn: document.getElementById('sendLinksBtn'),
+            clearLinksBtn: document.getElementById('clearLinksBtn'),
+            
+            // Dosya yönetimi
+            dropzone: document.getElementById('dropzone'),
+            fileInput: document.getElementById('fileInput'),
+            fileList: document.getElementById('fileList'),
+            sendFilesBtn: document.getElementById('sendFilesBtn'),
+            clearFilesBtn: document.getElementById('clearFilesBtn'),
+            
+            // Loglar
+            logList: document.getElementById('logList'),
+            downloadLogsBtn: document.getElementById('downloadLogsBtn'),
+            clearLogsBtn: document.getElementById('clearLogsBtn'),
+            
+            // Tema
+            themeToggle: document.getElementById('themeToggle'),
+            
+            // Tab'lar
+            tabs: document.querySelectorAll('.tab'),
+            tabContents: document.querySelectorAll('.tab-content'),
+            
+            // Mod seçici
+            modeButtons: document.querySelectorAll('.mode-btn'),
+            
+            // Geçmiş
+            historyList: document.getElementById('historyList')
+        };
+
+        // Yardımcı Fonksiyonlar
+        const helpers = {
+            // Tema kontrolü
+            initTheme: function() {
+                const savedTheme = localStorage.getItem('theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                dom.themeToggle.checked = savedTheme === 'light';
+            },
+
+            // Bildirim göster
+            showNotification: function(message, type = 'info') {
+                const container = document.getElementById('notificationContainer');
+                const notification = document.createElement('div');
+                notification.className = `notification notification-${type}`;
+                
+                let icon = 'fa-info-circle';
+                if (type === 'success') icon = 'fa-check-circle';
+                if (type === 'error') icon = 'fa-exclamation-circle';
+                if (type === 'warning') icon = 'fa-exclamation-triangle';
+                
+                notification.innerHTML = `
+                    <i class="fas ${icon}"></i>
+                    <span>${message}</span>
+                `;
+                
+                container.appendChild(notification);
+                
+                // 5 saniye sonra kaldır
+                setTimeout(() => {
+                    notification.classList.add('hide');
+                    setTimeout(() => notification.remove(), 300);
+                }, 5000);
+            },
+
+            // Log ekle
+            addLog: function(message, type = 'info') {
+                const logEntry = {
+                    id: Date.now(),
+                    time: new Date().toLocaleTimeString(),
+                    message,
+                    type
+                };
+                
+                state.logs.unshift(logEntry);
+                if (state.logs.length > 100) state.logs.pop(); // En fazla 100 log
+                this.saveLogs();
+                this.renderLogs();
+            },
+
+            // Logları render et
+            renderLogs: function() {
+                dom.logList.innerHTML = '';
+                
+                if (state.logs.length === 0) {
+                    dom.logList.innerHTML = '<div class="empty-state"><i class="fas fa-clipboard"></i><p>Henüz log yok</p></div>';
+                    return;
+                }
+                
+                state.logs.forEach(log => {
+                    const logElement = document.createElement('div');
+                    logElement.className = `log-entry log-${log.type}`;
+                    logElement.innerHTML = `
+                        <span class="log-time">[${log.time}]</span>
+                        <span>${log.message}</span>
+                    `;
+                    dom.logList.appendChild(logElement);
+                });
+            },
+
+            // State'i kaydet
+            saveState: function() {
+                localStorage.setItem('webhooks', JSON.stringify(state.webhooks));
+                localStorage.setItem('links', JSON.stringify(state.links));
+                localStorage.setItem('history', JSON.stringify(state.history));
+            },
+
+            // Logları kaydet
+            saveLogs: function() {
+                localStorage.setItem('logs', JSON.stringify(state.logs));
+            },
+
+            // Link tipini belirle
+            detectLinkType: function(url) {
+                const youtubeRegex = /(youtube\.com|youtu\.be)/;
+                const imageRegex = /\.(jpg|jpeg|png|gif|webp|bmp)(\?.*)?$/i;
+                const videoRegex = /\.(mp4|webm|mov|avi|mkv)(\?.*)?$/i;
+                const audioRegex = /\.(mp3|wav|ogg|flac)(\?.*)?$/i;
+                const pdfRegex = /\.pdf(\?.*)?$/i;
+                
+                if (youtubeRegex.test(url)) return 'YouTube';
+                if (imageRegex.test(url)) return 'Resim';
+                if (videoRegex.test(url)) return 'Video';
+                if (audioRegex.test(url)) return 'Ses';
+                if (pdfRegex.test(url)) return 'PDF';
+                
+                return 'Link';
+            },
+
+            // Dosya boyutunu formatla
+            formatFileSize: function(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            },
+
+            // Dosya ikonunu belirle
+            getFileIcon: function(filename) {
+                const ext = filename.split('.').pop().toLowerCase();
+                const icons = {
+                    jpg: 'fa-file-image', jpeg: 'fa-file-image', png: 'fa-file-image',
+                    gif: 'fa-file-image', webp: 'fa-file-image', bmp: 'fa-file-image',
+                    mp4: 'fa-file-video', webm: 'fa-file-video', mov: 'fa-file-video',
+                    avi: 'fa-file-video', mkv: 'fa-file-video',
+                    mp3: 'fa-file-audio', wav: 'fa-file-audio', ogg: 'fa-file-audio',
+                    pdf: 'fa-file-pdf',
+                    zip: 'fa-file-archive', rar: 'fa-file-archive', '7z': 'fa-file-archive',
+                    txt: 'fa-file-alt', doc: 'fa-file-word', docx: 'fa-file-word',
+                    xls: 'fa-file-excel', xlsx: 'fa-file-excel',
+                    ppt: 'fa-file-powerpoint', pptx: 'fa-file-powerpoint'
+                };
+                
+                return icons[ext] || 'fa-file';
+            }
+        };
+
+        // Webhook Yönetimi
+        const webhookManager = {
+            // Webhook ekle
+            addWebhook: function() {
+                const url = dom.webhookUrl.value.trim();
+                const name = dom.webhookName.value.trim() || 'Webhook';
+                
+                if (!url) {
+                    helpers.showNotification('Webhook URL boş olamaz', 'error');
+                    return;
+                }
+                
+                // Discord webhook URL kontrolü
+                if (!url.includes('discord.com/api/webhooks/')) {
+                    helpers.showNotification('Geçerli bir Discord webhook URL\'si girin', 'warning');
+                }
+                
+                const webhook = {
+                    id: Date.now(),
+                    name,
+                    url,
+                    date: new Date().toLocaleString()
+                };
+                
+                state.webhooks.push(webhook);
+                state.activeWebhook = webhook;
+                
+                helpers.saveState();
+                this.renderWebhooks();
+                
+                dom.webhookUrl.value = '';
+                dom.webhookName.value = '';
+                
+                helpers.showNotification(`"${name}" webhook'u eklendi`, 'success');
+                helpers.addLog(`"${name}" webhook'u eklendi`, 'success');
+            },
+
+            // Webhook'ları render et
+            renderWebhooks: function() {
+                dom.webhookList.innerHTML = '';
+                
+                if (state.webhooks.length === 0) {
+                    dom.webhookList.innerHTML = '<div class="empty-state"><i class="fas fa-link"></i><p>Henüz webhook eklenmedi</p></div>';
+                    return;
+                }
+                
+                state.webhooks.forEach(webhook => {
+                    const webhookElement = document.createElement('div');
+                    webhookElement.className = `webhook-item ${state.activeWebhook?.id === webhook.id ? 'active' : ''}`;
+                    webhookElement.innerHTML = `
+                        <div class="webhook-name">
+                            <span>${webhook.name}</span>
+                            <i class="fas fa-trash delete-webhook" data-id="${webhook.id}"></i>
+                        </div>
+                        <div class="webhook-url">${webhook.url}</div>
+                    `;
+                    
+                    // Tıklama olayı
+                    webhookElement.addEventListener('click', (e) => {
+                        if (!e.target.classList.contains('delete-webhook')) {
+                            state.activeWebhook = webhook;
+                            this.renderWebhooks();
+                            helpers.showNotification(`"${webhook.name}" aktif webhook olarak ayarlandı`, 'info');
+                        }
+                    });
+                    
+                    // Silme butonu
+                    const deleteBtn = webhookElement.querySelector('.delete-webhook');
+                    deleteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.deleteWebhook(webhook.id);
+                    });
+                    
+                    dom.webhookList.appendChild(webhookElement);
+                });
+            },
+
+            // Webhook sil
+            deleteWebhook: function(id) {
+                state.webhooks = state.webhooks.filter(w => w.id !== id);
+                
+                if (state.activeWebhook?.id === id) {
+                    state.activeWebhook = state.webhooks[0] || null;
+                }
+                
+                helpers.saveState();
+                this.renderWebhooks();
+                helpers.showNotification('Webhook silindi', 'info');
+                helpers.addLog('Webhook silindi', 'info');
+            },
+
+            // Webhook test et
+            testWebhook: async function() {
+                if (!state.activeWebhook) {
+                    helpers.showNotification('Önce bir webhook seçin', 'error');
+                    return;
+                }
+                
+                try {
+                    const response = await this.sendWebhookRequest({
+                        content: '✅ Webhook test başarılı!',
+                        username: 'Webhook Tester',
+                        avatar_url: 'https://cdn.discordapp.com/embed/avatars/0.png'
+                    });
+                    
+                    if (response.ok) {
+                        helpers.showNotification('Webhook testi başarılı', 'success');
+                        helpers.addLog(`"${state.activeWebhook.name}" webhook testi başarılı`, 'success');
+                    } else {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                } catch (error) {
+                    helpers.showNotification(`Webhook testi başarısız: ${error.message}`, 'error');
+                    helpers.addLog(`"${state.activeWebhook.name}" webhook testi başarısız: ${error.message}`, 'error');
+                }
+            },
+
+            // Webhook isteği gönder
+            sendWebhookRequest: async function(data) {
+                if (!state.activeWebhook) {
+                    throw new Error('Aktif webhook yok');
+                }
+                
+                const url = state.activeWebhook.url;
+                const options = {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                };
+                
+                // Proxy desteği
+                if (state.proxyEnabled && dom.proxyUrl.value.trim()) {
+                    const proxyUrl = dom.proxyUrl.value.trim();
+                    // Proxy için özel istek yapısı (basit bir örnek)
+                    options.headers['X-Target-URL'] = url;
+                    return fetch(proxyUrl, options);
+                }
+                
+                return fetch(url, options);
+            },
+
+            // Storage'ı temizle
+            clearStorage: function() {
+                if (confirm('Tüm webhook\'lar, linkler ve geçmiş silinecek. Emin misiniz?')) {
+                    localStorage.clear();
+                    state.webhooks = [];
+                    state.activeWebhook = null;
+                    state.links = [];
+                    state.history = [];
+                    state.logs = [];
+                    
+                    this.renderWebhooks();
+                    linkManager.renderLinks();
+                    fileManager.renderFiles();
+                    helpers.renderLogs();
+                    historyManager.renderHistory();
+                    
+                    helpers.showNotification('Tüm veriler temizlendi', 'info');
+                }
+            }
+        };
+
+        // Link Yönetimi
+        const linkManager = {
+            // Link ekle
+            addLink: function() {
+                const url = dom.linkUrl.value.trim();
+                
+                if (!url) {
+                    helpers.showNotification('Link URL\'si boş olamaz', 'error');
+                    return;
+                }
+                
+                try {
+                    new URL(url);
+                } catch {
+                    helpers.showNotification('Geçerli bir URL girin', 'error');
+                    return;
+                }
+                
+                const linkType = helpers.detectLinkType(url);
+                const link = {
+                    id: Date.now(),
+                    url,
+                    type: linkType,
+                    title: url.split('/').pop() || 'Link',
+                    added: new Date().toLocaleString()
+                };
+                
+                // YouTube için özel başlık çekme (basit örnek)
+                if (linkType === 'YouTube') {
+                    link.title = 'YouTube Videosu';
+                    link.thumbnail = 'https://img.youtube.com/vi/' + (url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/)?.[1] || '') + '/default.jpg';
+                }
+                
+                state.links.push(link);
+                helpers.saveState();
+                this.renderLinks();
+                
+                dom.linkUrl.value = '';
+                helpers.showNotification(`"${linkType}" linki eklendi`, 'success');
+                helpers.addLog(`"${linkType}" linki eklendi: ${url}`, 'info');
+            },
+
+            // Linkleri render et
+            renderLinks: function() {
+                dom.linkList.innerHTML = '';
+                dom.linkCount.textContent = `${state.links.length} link`;
+                
+                if (state.links.length === 0) {
+                    dom.linkList.innerHTML = '<div class="empty-state"><i class="fas fa-link"></i><p>Henüz link eklenmedi</p></div>';
+                    return;
+                }
+                
+                state.links.forEach(link => {
+                    const linkElement = document.createElement('div');
+                    linkElement.className = 'link-item';
+                    linkElement.innerHTML = `
+                        <div class="link-info">
+                            <div class="link-preview">
+                                ${link.thumbnail ? 
+                                    `<img src="${link.thumbnail}" alt="Önizleme" style="width:100%;height:100%;object-fit:cover;border-radius:4px;">` : 
+                                    `<i class="fas ${link.type === 'YouTube' ? 'fa-youtube' : 
+                                        link.type === 'Resim' ? 'fa-image' : 
+                                        link.type === 'Video' ? 'fa-video' : 
+                                        link.type === 'Ses' ? 'fa-music' : 
+                                        link.type === 'PDF' ? 'fa-file-pdf' : 'fa-link'}"></i>`
+                                }
+                            </div>
+                            <div class="link-details">
+                                <div class="link-title">${link.title}</div>
+                                <div class="link-url">${link.url}</div>
+                            </div>
+                            <div class="link-type">${link.type}</div>
+                        </div>
+                        <button class="btn btn-icon btn-secondary delete-link" data-id="${link.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    `;
+                    
+                    // Silme butonu
+                    const deleteBtn = linkElement.querySelector('.delete-link');
+                    deleteBtn.addEventListener('click', () => {
+                        this.deleteLink(link.id);
+                    });
+                    
+                    dom.linkList.appendChild(linkElement);
+                });
+            },
+
+            // Link sil
+            deleteLink: function(id) {
+                state.links = state.links.filter(l => l.id !== id);
+                helpers.saveState();
+                this.renderLinks();
+                helpers.showNotification('Link silindi', 'info');
+                helpers.addLog('Link silindi', 'info');
+            },
+
+            // Linkleri gönder
+            sendLinks: async function() {
+                if (!state.activeWebhook) {
+                    helpers.showNotification('Önce bir webhook seçin', 'error');
+                    return;
+                }
+                
+                if (state.links.length === 0) {
+                    helpers.showNotification('Gönderilecek link yok', 'warning');
+                    return;
+                }
+                
+                const mode = state.sendMode;
+                
+                if (mode === 'single') {
+                    // Tek tek gönder
+                    for (const link of state.links) {
+                        await this.sendSingleLink(link);
+                        // Her gönderim arasında 1 saniye bekle (rate limit)
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    }
+                } else {
+                    // Toplu gönder (Discord embed sınırına dikkat)
+                    await this.sendBatchLinks();
+                }
+                
+                // Geçmişe ekle
+                historyManager.addToHistory('links', state.links.length);
+            },
+
+            // Tek link gönder
+            sendSingleLink: async function(link) {
+                try {
+                    const data = {
+                        content: `🔗 ${link.url}`,
+                        username: '787 Link Gönderici',
+                        avatar_url: 'https://cdn.discordapp.com/attachments/1308901267845677237/1403801304425566230/787_bayrak.png?ex=69351918&is=6933c798&hm=8216da11cb9680f553d028147469639aac0dbe977b1dfc2ed9380e37fabc0b1d&'
+                    };
+                    
+                    // YouTube için embed
+                    if (link.type === 'YouTube') {
+                        data.embeds = [{
+                            title: link.title,
+                            url: link.url,
+                            color: 0xff0000,
+                            thumbnail: link.thumbnail ? { url: link.thumbnail } : undefined
+                        }];
+                    }
+                    
+                    const response = await webhookManager.sendWebhookRequest(data);
+                    
+                    if (response.ok) {
+                        helpers.addLog(`"${link.title}" gönderildi`, 'success');
+                    } else {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                } catch (error) {
+                    helpers.addLog(`"${link.title}" gönderilemedi: ${error.message}`, 'error');
+                }
+            },
+
+            // Toplu link gönder
+            sendBatchLinks: async function() {
+                try {
+                    const linksText = state.links.map(link => `• ${link.url}`).join('\n');
+                    
+                    const data = {
+                        content: `📎 **${state.links.length} link gönderiliyor:**\n${linksText}`,
+                        username: '787 Link Gönderici',
+                        avatar_url: 'https://cdn.discordapp.com/attachments/1308901267845677237/1403801304425566230/787_bayrak.png?ex=69351918&is=6933c798&hm=8216da11cb9680f553d028147469639aac0dbe977b1dfc2ed9380e37fabc0b1d&'
+                    };
+                    
+                    const response = await webhookManager.sendWebhookRequest(data);
+                    
+                    if (response.ok) {
+                        helpers.showNotification(`${state.links.length} link gönderildi`, 'success');
+                        helpers.addLog(`${state.links.length} link toplu gönderildi`, 'success');
+                    } else {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                } catch (error) {
+                    helpers.showNotification(`Linkler gönderilemedi: ${error.message}`, 'error');
+                    helpers.addLog(`Linkler toplu gönderilemedi: ${error.message}`, 'error');
+                }
+            },
+
+            // Link listesini temizle
+            clearLinks: function() {
+                if (state.links.length === 0) return;
+                
+                if (confirm(`${state.links.length} link silinecek. Emin misiniz?`)) {
+                    state.links = [];
+                    helpers.saveState();
+                    this.renderLinks();
+                    helpers.showNotification('Link listesi temizlendi', 'info');
+                    helpers.addLog('Link listesi temizlendi', 'info');
+                }
+            }
+        };
+
+        // Dosya Yönetimi
+        const fileManager = {
+            // Dosya ekle
+            addFiles: function(fileList) {
+                const maxSize = 25 * 1024 * 1024; // 25MB
+                
+                for (const file of fileList) {
+                    if (file.size > maxSize) {
+                        helpers.showNotification(`${file.name} dosyası çok büyük (max 25MB)`, 'error');
+                        continue;
+                    }
+                    
+                    const fileData = {
+                        id: Date.now() + Math.random(),
+                        file: file,
+                        name: file.name,
+                        size: file.size,
+                        type: file.type,
+                        progress: 0,
+                        status: 'pending'
+                    };
+                    
+                    state.files.push(fileData);
+                }
+                
+                this.renderFiles();
+                helpers.showNotification(`${fileList.length} dosya eklendi`, 'success');
+            },
+
+            // Dosyaları render et
+            renderFiles: function() {
+                dom.fileList.innerHTML = '';
+                
+                if (state.files.length === 0) {
+                    dom.fileList.innerHTML = '<div class="empty-state"><i class="fas fa-file-upload"></i><p>Henüz dosya eklenmedi</p></div>';
+                    return;
+                }
+                
+                state.files.forEach(fileData => {
+                    const fileElement = document.createElement('div');
+                    fileElement.className = 'file-item';
+                    fileElement.innerHTML = `
+                        <div class="file-info">
+                            <i class="fas ${helpers.getFileIcon(fileData.name)} file-icon"></i>
+                            <div class="file-details">
+                                <div class="file-name">${fileData.name}</div>
+                                <div class="file-size">${helpers.formatFileSize(fileData.size)}</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${fileData.progress}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-icon btn-secondary remove-file" data-id="${fileData.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    `;
+                    
+                    // Silme butonu
+                    const removeBtn = fileElement.querySelector('.remove-file');
+                    removeBtn.addEventListener('click', () => {
+                        this.removeFile(fileData.id);
+                    });
+                    
+                    dom.fileList.appendChild(fileElement);
+                });
+            },
+
+            // Dosya sil
+            removeFile: function(id) {
+                state.files = state.files.filter(f => f.id !== id);
+                this.renderFiles();
+                helpers.showNotification('Dosya kaldırıldı', 'info');
+            },
+
+            // Dosyaları gönder
+            sendFiles: async function() {
+                if (!state.activeWebhook) {
+                    helpers.showNotification('Önce bir webhook seçin', 'error');
+                    return;
+                }
+                
+                if (state.files.length === 0) {
+                    helpers.showNotification('Gönderilecek dosya yok', 'warning');
+                    return;
+                }
+                
+                const mode = state.sendMode;
+                
+                if (mode === 'single') {
+                    // Tek tek gönder
+                    for (const fileData of state.files) {
+                        await this.sendSingleFile(fileData);
+                    }
+                } else {
+                    // Toplu gönder (Discord'a uygun değil, tek tek gönderilecek)
+                    helpers.showNotification('Dosyalar tek tek gönderiliyor...', 'info');
+                    for (const fileData of state.files) {
+                        await this.sendSingleFile(fileData);
+                    }
+                }
+                
+                // Geçmişe ekle
+                historyManager.addToHistory('files', state.files.length);
+            },
+
+            // Tek dosya gönder
+            sendSingleFile: async function(fileData) {
+                // Discord dosya gönderme FormData ile yapılır
+                const formData = new FormData();
+                formData.append('file', fileData.file);
+                formData.append('username', '787 Dosya Gönderici');
+                formData.append('avatar_url', 'https://cdn.discordapp.com/attachments/1308901267845677237/1403801304425566230/787_bayrak.png?ex=69351918&is=6933c798&hm=8216da11cb9680f553d028147469639aac0dbe977b1dfc2ed9380e37fabc0b1d&');
+                
+                try {
+                    const url = state.activeWebhook.url;
+                    
+                    // Proxy desteği
+                    let finalUrl = url;
+                    if (state.proxyEnabled && dom.proxyUrl.value.trim()) {
+                        // Proxy için özel işlem (bu örnekte basit tutuyoruz)
+                        finalUrl = dom.proxyUrl.value.trim();
+                        formData.append('target_url', url);
+                    }
+                    
+                    const response = await fetch(finalUrl, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (response.ok) {
+                        fileData.progress = 100;
+                        fileData.status = 'sent';
+                        this.renderFiles();
+                        helpers.addLog(`"${fileData.name}" gönderildi`, 'success');
+                    } else {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                } catch (error) {
+                    fileData.status = 'error';
+                    this.renderFiles();
+                    helpers.addLog(`"${fileData.name}" gönderilemedi: ${error.message}`, 'error');
+                }
+            },
+
+            // Dosya listesini temizle
+            clearFiles: function() {
+                if (state.files.length === 0) return;
+                
+                if (confirm(`${state.files.length} dosya kaldırılacak. Emin misiniz?`)) {
+                    state.files = [];
+                    this.renderFiles();
+                    helpers.showNotification('Dosya listesi temizlendi', 'info');
+                    helpers.addLog('Dosya listesi temizlendi', 'info');
+                }
+            }
+        };
+
+        // Geçmiş Yönetimi
+        const historyManager = {
+            // Geçmişe ekle
+            addToHistory: function(type, count) {
+                const entry = {
+                    id: Date.now(),
+                    type,
+                    count,
+                    date: new Date().toLocaleString(),
+                    webhook: state.activeWebhook?.name || 'Bilinmeyen'
+                };
+                
+                state.history.unshift(entry);
+                if (state.history.length > 50) state.history.pop(); // En fazla 50 kayıt
+                helpers.saveState();
+                this.renderHistory();
+            },
+
+            // Geçmişi render et
+            renderHistory: function() {
+                dom.historyList.innerHTML = '';
+                
+                if (state.history.length === 0) {
+                    dom.historyList.innerHTML = '<div class="empty-state"><i class="fas fa-history"></i><p>Henüz geçmiş yok</p></div>';
+                    return;
+                }
+                
+                state.history.forEach(entry => {
+                    const entryElement = document.createElement('div');
+                    entryElement.className = 'log-entry log-info';
+                    entryElement.innerHTML = `
+                        <span class="log-time">[${entry.date}]</span>
+                        <span>
+                            <strong>${entry.webhook}</strong> webhook'una 
+                            ${entry.type === 'links' ? `${entry.count} link` : `${entry.count} dosya`} gönderildi
+                        </span>
+                    `;
+                    dom.historyList.appendChild(entryElement);
+                });
+            }
+        };
+
+        // Log Yönetimi
+        const logManager = {
+            // Logları indir
+            downloadLogs: function() {
+                if (state.logs.length === 0) {
+                    helpers.showNotification('İndirilecek log yok', 'warning');
+                    return;
+                }
+                
+                const logText = state.logs.map(log => `[${log.time}] ${log.message}`).join('\n');
+                const blob = new Blob([logText], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `webhook-logs-${new Date().toISOString().slice(0, 10)}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                helpers.showNotification('Loglar indirildi', 'success');
+            },
+
+            // Logları temizle
+            clearLogs: function() {
+                if (state.logs.length === 0) return;
+                
+                if (confirm(`${state.logs.length} log silinecek. Emin misiniz?`)) {
+                    state.logs = [];
+                    helpers.saveLogs();
+                    helpers.renderLogs();
+                    helpers.showNotification('Loglar temizlendi', 'info');
+                }
+            }
+        };
+
+        // Event Listeners
+        const initEventListeners = function() {
+            // Tema değiştirme
+            dom.themeToggle.addEventListener('change', function() {
+                const theme = this.checked ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+                helpers.showNotification(`${theme === 'light' ? 'Açık' : 'Koyu'} tema aktif`, 'info');
+            });
+
+            // Proxy toggle
+            dom.proxyToggle.addEventListener('change', function() {
+                state.proxyEnabled = this.checked;
+                dom.proxyContainer.style.display = this.checked ? 'block' : 'none';
+            });
+
+            // Webhook işlemleri
+            dom.addWebhookBtn.addEventListener('click', () => webhookManager.addWebhook());
+            dom.testWebhookBtn.addEventListener('click', () => webhookManager.testWebhook());
+            dom.clearStorageBtn.addEventListener('click', () => webhookManager.clearStorage());
+
+            // Link işlemleri
+            dom.addLinkBtn.addEventListener('click', () => linkManager.addLink());
+            dom.sendLinksBtn.addEventListener('click', () => linkManager.sendLinks());
+            dom.clearLinksBtn.addEventListener('click', () => linkManager.clearLinks());
+
+            // Dosya işlemleri
+            dom.dropzone.addEventListener('click', () => dom.fileInput.click());
+            dom.dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dom.dropzone.classList.add('dragover');
+            });
+            dom.dropzone.addEventListener('dragleave', () => {
+                dom.dropzone.classList.remove('dragover');
+            });
+            dom.dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dom.dropzone.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                fileManager.addFiles(files);
+            });
+            dom.fileInput.addEventListener('change', (e) => {
+                const files = e.target.files;
+                fileManager.addFiles(files);
+                dom.fileInput.value = '';
+            });
+            dom.sendFilesBtn.addEventListener('click', () => fileManager.sendFiles());
+            dom.clearFilesBtn.addEventListener('click', () => fileManager.clearFiles());
+
+            // Log işlemleri
+            dom.downloadLogsBtn.addEventListener('click', () => logManager.downloadLogs());
+            dom.clearLogsBtn.addEventListener('click', () => logManager.clearLogs());
+
+            // Tab değiştirme
+            dom.tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    // Aktif tab'ı güncelle
+                    dom.tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Aktif içeriği göster
+                    dom.tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === `${tabId}Tab`) {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+
+            // Mod değiştirme
+            dom.modeButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    dom.modeButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    state.sendMode = btn.getAttribute('data-mode');
+                    helpers.showNotification(`${state.sendMode === 'single' ? 'Tekli' : 'Toplu'} gönderim modu aktif`, 'info');
+                });
+            });
+
+            // Enter tuşu ile link ekleme
+            dom.linkUrl.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    linkManager.addLink();
+                }
+            });
+
+            // Enter tuşu ile webhook ekleme
+            dom.webhookUrl.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    webhookManager.addWebhook();
+                }
+            });
+        };
+
+        // Uygulamayı başlat
+        const initApp = function() {
+            // Tema ve state'i yükle
+            helpers.initTheme();
+            webhookManager.renderWebhooks();
+            linkManager.renderLinks();
+            fileManager.renderFiles();
+            helpers.renderLogs();
+            historyManager.renderHistory();
+            
+            // Event listener'ları ekle
+            initEventListeners();
+            
+            // Varsayılan webhook yoksa ekle
+            if (state.webhooks.length === 0) {
+                helpers.showNotification('Hoş geldiniz! İlk webhook\'unuzu ekleyerek başlayın.', 'info');
+                helpers.addLog('Uygulama başlatıldı', 'info');
+            } else {
+                // İlk webhook'u aktif yap
+                state.activeWebhook = state.webhooks[0];
+                webhookManager.renderWebhooks();
+            }
+            
+            console.log('Webhook Gönderici uygulaması başlatıldı');
+        };
+
+        // Uygulamayı başlat
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
