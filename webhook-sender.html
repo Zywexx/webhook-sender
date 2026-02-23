@@ -1,1888 +1,1454 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>787 Webhook Gönderici</title>
+    <title>787 Webhook</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            /* Discord tarzı koyu tema */
-            --bg-primary: #1e1f29;
-            --bg-secondary: #2a2b36;
-            --bg-tertiary: #363843;
-            --bg-card: #2f303d;
-            --bg-input: #252631;
-            --text-primary: #ffffff;
-            --text-secondary: #b9bbbe;
-            --text-muted: #8a8d93;
-            --accent: #5865f2;
-            --accent-hover: #4752c4;
-            --success: #57f287;
-            --warning: #faa81a;
-            --error: #ed4245;
-            --border: #40424e;
-            --shadow: rgba(0, 0, 0, 0.2);
-            --radius: 8px;
-            --transition: all 0.2s ease;
-        }
-
-        [data-theme="light"] {
-            /* Light tema */
-            --bg-primary: #f8f9fa;
-            --bg-secondary: #ffffff;
-            --bg-tertiary: #e9ecef;
-            --bg-card: #ffffff;
-            --bg-input: #f1f3f5;
-            --text-primary: #212529;
-            --text-secondary: #495057;
-            --text-muted: #6c757d;
-            --accent: #5865f2;
-            --accent-hover: #4752c4;
-            --success: #28a745;
-            --warning: #ffc107;
-            --error: #dc3545;
-            --border: #dee2e6;
-            --shadow: rgba(0, 0, 0, 0.05);
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        :root {
+            --bg: #0b0d17;
+            --surface: #131627;
+            --surface2: #1a1d33;
+            --surface3: #22264a;
+            --text: #e2e8f0;
+            --text2: #94a3b8;
+            --text3: #64748b;
+            --accent: #5865f2;
+            --accent-hover: #4752c4;
+            --green: #23a559;
+            --red: #f23f43;
+            --yellow: #f0b232;
+            --border: rgba(255, 255, 255, 0.06);
+            --r: 10px;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            transition: var(--transition);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-            display: grid;
-            grid-template-columns: 300px 1fr 350px;
-            gap: 20px;
+            background: var(--bg);
+            color: var(--text);
             height: 100vh;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            background-color: var(--bg-secondary);
-            border-radius: var(--radius);
-            padding: 20px;
-            box-shadow: 0 4px 12px var(--shadow);
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            overflow-y: auto;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--accent);
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .logo i {
-            font-size: 1.8rem;
-        }
-
-        .section-title {
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-muted);
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .section-title i {
-            font-size: 0.8rem;
-        }
-
-        .webhook-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            max-height: 300px;
-            overflow-y: auto;
-            padding-right: 5px;
-        }
-
-        .webhook-item {
-            background-color: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 12px 15px;
-            cursor: pointer;
-            transition: var(--transition);
-            border: 1px solid transparent;
-            position: relative;
-        }
-
-        .webhook-item:hover {
-            background-color: var(--bg-tertiary);
-            transform: translateY(-2px);
-        }
-
-        .webhook-item.active {
-            border-color: var(--accent);
-            background-color: rgba(88, 101, 242, 0.1);
-        }
-
-        .webhook-name {
-            font-weight: 600;
-            font-size: 0.95rem;
-            margin-bottom: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .webhook-url {
-            font-size: 0.75rem;
-            color: var(--text-muted);
             overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
 
-        .btn {
-            padding: 10px 15px;
-            border-radius: var(--radius);
-            border: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+        /* ─── LAYOUT ─── */
+        .app {
+            display: grid;
+            grid-template-columns: 280px 1fr 320px;
+            height: 100vh;
+            gap: 0;
         }
 
-        .btn-primary {
-            background-color: var(--accent);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--accent-hover);
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background-color: var(--bg-tertiary);
-            color: var(--text-primary);
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--border);
-        }
-
-        .btn-success {
-            background-color: var(--success);
-            color: white;
-        }
-
-        .btn-error {
-            background-color: var(--error);
-            color: white;
-        }
-
-        .btn-small {
-            padding: 6px 12px;
-            font-size: 0.8rem;
-        }
-
-        .btn-icon {
-            padding: 8px;
-            width: 36px;
-            height: 36px;
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-        }
-
-        .input-label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 12px 15px;
-            background-color: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            font-size: 0.9rem;
-            transition: var(--transition);
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(88, 101, 242, 0.2);
-        }
-
-        /* Main Content */
-        .main-content {
-            background-color: var(--bg-secondary);
-            border-radius: var(--radius);
-            padding: 20px;
-            box-shadow: 0 4px 12px var(--shadow);
+        .panel {
+            background: var(--surface);
+            border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            overflow-y: auto;
+            overflow: hidden;
         }
 
-        .tab-container {
-            display: flex;
+        .panel:last-child {
+            border-right: none;
+            border-left: 1px solid var(--border);
+        }
+
+        .panel-header {
+            padding: 18px 20px;
             border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+        }
+
+        .panel-header i {
+            color: var(--accent);
+        }
+
+        .panel-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        /* ─── SCROLLBAR ─── */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--surface3);
+            border-radius: 2px;
+        }
+
+        /* ─── SECTION ─── */
+        .section {
             margin-bottom: 20px;
         }
 
-        .tab {
-            padding: 12px 24px;
-            cursor: pointer;
+        .section-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text3);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ─── INPUTS ─── */
+        .field {
+            margin-bottom: 12px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text2);
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .field input,
+        .field textarea,
+        .field select {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 9px 12px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        .field input:focus,
+        .field textarea:focus {
+            border-color: var(--accent);
+        }
+
+        .field textarea {
+            resize: vertical;
+            min-height: 70px;
+        }
+
+        /* ─── BUTTONS ─── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.78rem;
             font-weight: 600;
-            color: var(--text-secondary);
-            transition: var(--transition);
-            border-bottom: 3px solid transparent;
-            position: relative;
+            font-family: inherit;
+            cursor: pointer;
+            transition: opacity 0.15s;
+            color: white;
         }
 
-        .tab:hover {
-            color: var(--text-primary);
+        .btn:hover {
+            opacity: 0.85;
         }
 
-        .tab.active {
+        .btn-accent {
+            background: var(--accent);
+        }
+
+        .btn-green {
+            background: var(--green);
+        }
+
+        .btn-red {
+            background: var(--red);
+        }
+
+        .btn-ghost {
+            background: var(--surface2);
+            color: var(--text2);
+            border: 1px solid var(--border);
+        }
+
+        .btn-sm {
+            padding: 6px 10px;
+            font-size: 0.72rem;
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* ─── WEBHOOK LIST ─── */
+        .wh-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: border-color 0.15s;
+        }
+
+        .wh-item:hover,
+        .wh-item.active {
+            border-color: var(--accent);
+        }
+
+        .wh-item.active {
+            background: var(--surface2);
+        }
+
+        .wh-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text3);
+            flex-shrink: 0;
+        }
+
+        .wh-item.active .wh-dot {
+            background: var(--green);
+        }
+
+        .wh-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .wh-name {
+            font-size: 0.82rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .wh-url {
+            font-size: 0.68rem;
+            color: var(--text3);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .wh-del {
+            color: var(--text3);
+            cursor: pointer;
+            font-size: 0.75rem;
+            padding: 4px;
+        }
+
+        .wh-del:hover {
+            color: var(--red);
+        }
+
+        /* ─── TABS ─── */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 8px;
+            text-align: center;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text3);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: color 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            font-family: inherit;
+        }
+
+        .tab-btn:hover {
+            color: var(--text);
+        }
+
+        .tab-btn.active {
             color: var(--accent);
             border-bottom-color: var(--accent);
         }
 
-        .tab-content {
+        .tab-page {
             display: none;
-            animation: fadeIn 0.3s ease;
         }
 
-        .tab-content.active {
+        .tab-page.active {
             display: block;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
+        /* ─── CARDS ─── */
         .card {
-            background-color: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 20px;
-            box-shadow: 0 2px 8px var(--shadow);
-            margin-bottom: 20px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            padding: 16px;
+            margin-bottom: 14px;
         }
 
         .card-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 15px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
-        .link-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            max-height: 300px;
-            overflow-y: auto;
-            margin-bottom: 15px;
-            padding-right: 5px;
-        }
-
-        .link-item {
-            background-color: var(--bg-tertiary);
-            border-radius: var(--radius);
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: var(--transition);
-        }
-
-        .link-item:hover {
-            background-color: var(--border);
-        }
-
-        .link-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex: 1;
-        }
-
-        .link-preview {
-            width: 60px;
-            height: 60px;
-            border-radius: 4px;
-            object-fit: cover;
-            background-color: var(--bg-input);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-muted);
-        }
-
-        .link-details {
-            flex: 1;
-        }
-
-        .link-title {
-            font-weight: 600;
-            margin-bottom: 5px;
-            font-size: 0.95rem;
-        }
-
-        .link-url {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .link-type {
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 10px;
-            background-color: var(--accent);
-            color: white;
-            font-weight: 600;
-        }
-
-        .dropzone {
-            border: 2px dashed var(--border);
-            border-radius: var(--radius);
-            padding: 40px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transition);
-            background-color: var(--bg-input);
-        }
-
-        .dropzone:hover, .dropzone.dragover {
-            border-color: var(--accent);
-            background-color: rgba(88, 101, 242, 0.05);
-        }
-
-        .dropzone i {
-            font-size: 2.5rem;
-            color: var(--text-muted);
-            margin-bottom: 15px;
-        }
-
-        .file-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 20px;
-            max-height: 300px;
-            overflow-y: auto;
-            padding-right: 5px;
-        }
-
-        .file-item {
-            background-color: var(--bg-tertiary);
-            border-radius: var(--radius);
-            padding: 12px 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: var(--transition);
-        }
-
-        .file-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex: 1;
-        }
-
-        .file-icon {
-            font-size: 1.2rem;
+        .card-title i {
             color: var(--accent);
-        }
-
-        .file-details {
-            flex: 1;
-        }
-
-        .file-name {
-            font-weight: 600;
-            margin-bottom: 5px;
             font-size: 0.9rem;
         }
 
-        .file-size {
-            font-size: 0.8rem;
-            color: var(--text-muted);
+        /* ─── LINK / FILE ITEMS ─── */
+        .list-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 0.78rem;
         }
 
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background-color: var(--bg-input);
-            border-radius: 3px;
-            margin-top: 8px;
+        .list-item .info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .list-item .title {
+            font-weight: 600;
+            white-space: nowrap;
             overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .list-item .sub {
+            font-size: 0.7rem;
+            color: var(--text3);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .list-item .badge {
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: var(--accent);
+            color: white;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        /* ─── EMBED PREVIEW ─── */
+        .embed-preview {
+            background: var(--bg);
+            border-left: 4px solid var(--accent);
+            border-radius: 0 6px 6px 0;
+            padding: 14px;
+            margin-top: 10px;
+        }
+
+        .embed-preview .ep-title {
+            font-weight: 700;
+            font-size: 0.88rem;
+            margin-bottom: 6px;
+        }
+
+        .embed-preview .ep-desc {
+            font-size: 0.8rem;
+            color: var(--text2);
+            line-height: 1.5;
+        }
+
+        /* ─── TEMPLATE PILLS ─── */
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            background: var(--surface3);
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text2);
+            cursor: pointer;
+            margin: 0 4px 4px 0;
+            transition: background 0.15s;
+        }
+
+        .pill:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .pill .pill-x {
+            font-size: 0.6rem;
+            opacity: 0.6;
+        }
+
+        .pill .pill-x:hover {
+            opacity: 1;
+            color: var(--red);
+        }
+
+        /* ─── MODE TOGGLE ─── */
+        .mode-toggle {
+            display: flex;
+            background: var(--bg);
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .mode-opt {
+            flex: 1;
+            text-align: center;
+            padding: 7px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text3);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .mode-opt.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* ─── DROPZONE ─── */
+        .dropzone {
+            border: 2px dashed var(--border);
+            border-radius: var(--r);
+            padding: 30px 20px;
+            text-align: center;
+            color: var(--text3);
+            cursor: pointer;
+            transition: border-color 0.15s;
+            margin-bottom: 12px;
+        }
+
+        .dropzone:hover,
+        .dropzone.dragover {
+            border-color: var(--accent);
+            color: var(--text2);
+        }
+
+        .dropzone i {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .dropzone p {
+            font-size: 0.78rem;
+        }
+
+        /* ─── LOG ENTRIES ─── */
+        .log-entry {
+            padding: 8px 10px;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            font-size: 0.75rem;
+            display: flex;
+            gap: 8px;
+            background: var(--bg);
+            border-left: 3px solid var(--text3);
+        }
+
+        .log-entry.success {
+            border-left-color: var(--green);
+        }
+
+        .log-entry.error {
+            border-left-color: var(--red);
+        }
+
+        .log-entry.warning {
+            border-left-color: var(--yellow);
+        }
+
+        .log-entry .log-time {
+            color: var(--text3);
+            font-size: 0.7rem;
+            white-space: nowrap;
+        }
+
+        .log-entry .log-msg {
+            flex: 1;
+            color: var(--text2);
+            word-break: break-word;
+        }
+
+        /* ─── EMPTY STATE ─── */
+        .empty {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--text3);
+            font-size: 0.8rem;
+        }
+
+        .empty i {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            display: block;
+            opacity: 0.4;
+        }
+
+        /* ─── NOTIFICATION ─── */
+        .toast-container {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8rem;
+            color: var(--text);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            animation: toastIn 0.2s ease;
+            max-width: 360px;
+        }
+
+        .toast.hide {
+            animation: toastOut 0.2s ease forwards;
+        }
+
+        .toast.success i {
+            color: var(--green);
+        }
+
+        .toast.error i {
+            color: var(--red);
+        }
+
+        .toast.warning i {
+            color: var(--yellow);
+        }
+
+        .toast.info i {
+            color: var(--accent);
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+        }
+
+        /* ─── TOGGLE SWITCH ─── */
+        .switch {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.78rem;
+            color: var(--text2);
+        }
+
+        .switch input {
+            display: none;
+        }
+
+        .switch-track {
+            width: 34px;
+            height: 18px;
+            background: var(--surface3);
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .switch-track::after {
+            content: '';
+            width: 14px;
+            height: 14px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.15s;
+        }
+
+        .switch input:checked+.switch-track {
+            background: var(--accent);
+        }
+
+        .switch input:checked+.switch-track::after {
+            transform: translateX(16px);
+        }
+
+        /* ─── PROGRESS ─── */
+        .progress {
+            width: 100%;
+            height: 3px;
+            background: var(--border);
+            border-radius: 2px;
+            margin-top: 4px;
         }
 
         .progress-fill {
             height: 100%;
-            background-color: var(--accent);
-            border-radius: 3px;
-            transition: width 0.3s ease;
+            background: var(--accent);
+            border-radius: 2px;
+            transition: width 0.3s;
         }
 
-        /* Log Panel */
-        .log-panel {
-            background-color: var(--bg-secondary);
-            border-radius: var(--radius);
-            padding: 20px;
-            box-shadow: 0 4px 12px var(--shadow);
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-        }
-
-        .log-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .log-list {
-            flex: 1;
-            overflow-y: auto;
-            background-color: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 15px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            line-height: 1.5;
-        }
-
-        .log-entry {
-            padding: 8px 10px;
-            border-radius: 4px;
-            margin-bottom: 8px;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(-10px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        .log-success {
-            background-color: rgba(87, 242, 135, 0.1);
-            border-left: 3px solid var(--success);
-            color: var(--success);
-        }
-
-        .log-error {
-            background-color: rgba(237, 66, 69, 0.1);
-            border-left: 3px solid var(--error);
-            color: var(--error);
-        }
-
-        .log-info {
-            background-color: rgba(88, 101, 242, 0.1);
-            border-left: 3px solid var(--accent);
-            color: var(--accent);
-        }
-
-        .log-warning {
-            background-color: rgba(250, 168, 26, 0.1);
-            border-left: 3px solid var(--warning);
-            color: var(--warning);
-        }
-
-        .log-time {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-right: 10px;
-        }
-
-        .toggle-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            padding: 10px 15px;
-            background-color: var(--bg-card);
-            border-radius: var(--radius);
-        }
-
-        .toggle-switch {
-            position: relative;
-            width: 50px;
-            height: 26px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
+        /* ─── FOOTER ─── */
+        .footer {
+            position: fixed;
+            bottom: 0;
             left: 0;
             right: 0;
-            bottom: 0;
-            background-color: var(--bg-tertiary);
-            transition: var(--transition);
-            border-radius: 34px;
-        }
-
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: var(--transition);
-            border-radius: 50%;
-        }
-
-        input:checked + .toggle-slider {
-            background-color: var(--accent);
-        }
-
-        input:checked + .toggle-slider:before {
-            transform: translateX(24px);
-        }
-
-        .theme-toggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 0.68rem;
+            color: var(--text3);
+            background: var(--surface);
+            border-top: 1px solid var(--border);
             z-index: 100;
+            letter-spacing: 0.3px;
         }
 
-        .notification {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 12px 20px;
-            border-radius: var(--radius);
-            background-color: var(--bg-card);
-            color: var(--text-primary);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 1000;
-            animation: slideUp 0.3s ease;
-            transform: translateY(0);
-            max-width: 300px;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(100px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .notification.hide {
-            animation: slideDown 0.3s ease;
-            transform: translateY(100px);
-            opacity: 0;
-        }
-
-        @keyframes slideDown {
-            from { transform: translateY(0); opacity: 1; }
-            to { transform: translateY(100px); opacity: 0; }
-        }
-
-        .notification-success {
-            border-left: 4px solid var(--success);
-        }
-
-        .notification-error {
-            border-left: 4px solid var(--error);
-        }
-
-        .notification-warning {
-            border-left: 4px solid var(--warning);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-muted);
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .mode-selector {
-            display: flex;
-            gap: 5px;
-            background-color: var(--bg-input);
-            border-radius: var(--radius);
-            padding: 5px;
-            margin-bottom: 15px;
-        }
-
-        .mode-btn {
-            flex: 1;
-            padding: 8px 12px;
-            text-align: center;
-            cursor: pointer;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            transition: var(--transition);
-        }
-
-        .mode-btn.active {
-            background-color: var(--accent);
-            color: white;
-        }
-
-        /* Mobil Uyumluluk */
-        @media (max-width: 1200px) {
-            .container {
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 1024px) {
+            .app {
                 grid-template-columns: 1fr;
-                grid-template-rows: auto auto auto;
+            }
+
+            .panel {
+                border: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            body {
+                overflow: auto;
+            }
+
+            .app {
                 height: auto;
             }
-            
-            .sidebar, .main-content, .log-panel {
-                min-height: 400px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-                gap: 10px;
-            }
-            
-            .link-info, .file-info {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 8px;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-            }
-            
-            .tab-container {
-                overflow-x: auto;
-            }
-            
-            .tab {
-                padding: 10px 15px;
-                font-size: 0.9rem;
-                white-space: nowrap;
-            }
-        }
-
-        /* Scrollbar Stili */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--bg-tertiary);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent);
         }
     </style>
 </head>
+
 <body>
-    <!-- Tema Değiştirme Butonu -->
-    <div class="theme-toggle">
-        <label class="toggle-switch">
-            <input type="checkbox" id="themeToggle">
-            <span class="toggle-slider"></span>
-        </label>
-    </div>
 
-    <div class="container">
-        <!-- Sidebar - Webhook Yönetimi -->
-        <div class="sidebar">
-            <div class="logo">
+    <div class="app">
+        <!-- ═══ SIDEBAR ═══ -->
+        <div class="panel">
+            <div class="panel-header">
                 <i class="fas fa-paper-plane"></i>
-                <span>787 Webhook Gönderici</span>
+                787 Webhook
             </div>
-            
-            <div>
-                <div class="section-title">
-                    <i class="fas fa-link"></i>
-                    <span>Webhook Yönetimi</span>
+            <div class="panel-body">
+                <!-- Identity -->
+                <div class="section">
+                    <div class="section-label"><i class="fas fa-user-circle"></i> Kimlik</div>
+                    <div class="field">
+                        <label>Gönderici Adı</label>
+                        <input type="text" id="identityName" placeholder="787 Bot">
+                    </div>
+                    <div class="field">
+                        <label>Avatar URL</label>
+                        <input type="text" id="identityAvatar" placeholder="https://...">
+                    </div>
                 </div>
-                
-                <div class="input-group">
-                    <label class="input-label">Webhook URL</label>
-                    <input type="text" class="input-field" id="webhookUrl" placeholder="https://discord.com/api/webhooks/...">
+
+                <!-- Webhook Management -->
+                <div class="section">
+                    <div class="section-label"><i class="fas fa-plug"></i> Webhook</div>
+                    <div class="field">
+                        <label>Webhook URL</label>
+                        <input type="text" id="webhookUrl" placeholder="https://discord.com/api/webhooks/...">
+                    </div>
+                    <div class="field">
+                        <label>İsim (Opsiyonel)</label>
+                        <input type="text" id="webhookName" placeholder="Sunucu #1">
+                    </div>
+                    <button class="btn btn-accent btn-full" id="addWebhookBtn">
+                        <i class="fas fa-plus"></i> Ekle
+                    </button>
                 </div>
-                
-                <div class="input-group">
-                    <label class="input-label">Webhook Adı (Opsiyonel)</label>
-                    <input type="text" class="input-field" id="webhookName" placeholder="Sunucu İsmi">
+
+                <!-- Webhook List -->
+                <div class="section">
+                    <div class="section-label"><i class="fas fa-list"></i> Kayıtlı</div>
+                    <div id="webhookList"></div>
                 </div>
-                
-                <button class="btn btn-primary" id="addWebhookBtn">
-                    <i class="fas fa-plus"></i>
-                    <span>Webhook Ekle</span>
-                </button>
-                
-                <div class="section-title">
-                    <i class="fas fa-list"></i>
-                    <span>Kayıtlı Webhook'lar</span>
-                </div>
-                
-                <div class="webhook-list" id="webhookList">
-                    <!-- Webhook'lar buraya eklenecek -->
-                </div>
-                
-                <div class="toggle-container">
-                    <span>Proxy Kullan</span>
-                    <label class="toggle-switch">
+
+                <!-- Proxy -->
+                <div class="section">
+                    <label class="switch">
                         <input type="checkbox" id="proxyToggle">
-                        <span class="toggle-slider"></span>
+                        <span class="switch-track"></span>
+                        Proxy Kullan
                     </label>
-                </div>
-                
-                <div id="proxyContainer" style="display: none;">
-                    <div class="input-group">
-                        <label class="input-label">Proxy URL</label>
-                        <input type="text" class="input-field" id="proxyUrl" placeholder="http://proxy.example.com:8080">
+                    <div id="proxyBox" style="display:none; margin-top:10px;">
+                        <div class="field">
+                            <label>Proxy URL</label>
+                            <input type="text" id="proxyUrl" placeholder="http://proxy:8080">
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="action-buttons">
-                <button class="btn btn-secondary" id="testWebhookBtn">
-                    <i class="fas fa-vial"></i>
-                    <span>Test Et</span>
-                </button>
-                <button class="btn btn-secondary" id="clearStorageBtn">
-                    <i class="fas fa-trash"></i>
-                    <span>Temizle</span>
-                </button>
-            </div>
-        </div>
-        
-        <!-- Main Content - Link ve Dosya Gönderimi -->
-        <div class="main-content">
-            <div class="tab-container">
-                <div class="tab active" data-tab="links">
-                    <i class="fas fa-link"></i>
-                    <span>Link Gönder</span>
-                </div>
-                <div class="tab" data-tab="files">
-                    <i class="fas fa-file-upload"></i>
-                    <span>Dosya Gönder</span>
-                </div>
-                <div class="tab" data-tab="history">
-                    <i class="fas fa-history"></i>
-                    <span>Geçmiş</span>
-                </div>
-            </div>
-            
-            <!-- Link Gönderimi Tab -->
-            <div class="tab-content active" id="linksTab">
-                <div class="card">
-                    <div class="card-title">
-                        <i class="fas fa-plus-circle"></i>
-                        <span>Yeni Link Ekle</span>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label class="input-label">Link URL'si</label>
-                        <input type="text" class="input-field" id="linkUrl" placeholder="https://example.com/...">
-                    </div>
-                    
-                    <button class="btn btn-primary" id="addLinkBtn">
-                        <i class="fas fa-plus"></i>
-                        <span>Listeye Ekle</span>
-                    </button>
-                </div>
-                
-                <div class="card">
-                    <div class="card-title">
-                        <i class="fas fa-list"></i>
-                        <span>Link Listesi</span>
-                        <span class="link-type" id="linkCount">0 link</span>
-                    </div>
-                    
-                    <div class="mode-selector">
-                        <div class="mode-btn active" data-mode="single">Tekli Gönderim</div>
-                        <div class="mode-btn" data-mode="batch">Toplu Gönderim</div>
-                    </div>
-                    
-                    <div class="link-list" id="linkList">
-                        <!-- Linkler buraya eklenecek -->
-                    </div>
-                    
-                    <div class="action-buttons">
-                        <button class="btn btn-success" id="sendLinksBtn">
-                            <i class="fas fa-paper-plane"></i>
-                            <span>Linkleri Gönder</span>
-                        </button>
-                        <button class="btn btn-error" id="clearLinksBtn">
-                            <i class="fas fa-trash"></i>
-                            <span>Listeyi Temizle</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Dosya Gönderimi Tab -->
-            <div class="tab-content" id="filesTab">
-                <div class="card">
-                    <div class="card-title">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <span>Dosya Yükle</span>
-                    </div>
-                    
-                    <div class="dropzone" id="dropzone">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <h3>Dosyaları sürükleyip bırakın veya tıklayarak seçin</h3>
-                        <p>Maksimum dosya boyutu: 25MB</p>
-                        <p>Desteklenen formatlar: Resim, Video, PDF, ZIP</p>
-                    </div>
-                    
-                    <input type="file" id="fileInput" multiple style="display: none;">
-                    
-                    <div class="mode-selector">
-                        <div class="mode-btn active" data-mode="single">Tekli Gönderim</div>
-                        <div class="mode-btn" data-mode="batch">Toplu Gönderim</div>
-                    </div>
-                    
-                    <div class="file-list" id="fileList">
-                        <!-- Dosyalar buraya eklenecek -->
-                    </div>
-                    
-                    <div class="action-buttons">
-                        <button class="btn btn-success" id="sendFilesBtn">
-                            <i class="fas fa-paper-plane"></i>
-                            <span>Dosyaları Gönder</span>
-                        </button>
-                        <button class="btn btn-error" id="clearFilesBtn">
-                            <i class="fas fa-trash"></i>
-                            <span>Tümünü Kaldır</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Geçmiş Tab -->
-            <div class="tab-content" id="historyTab">
-                <div class="card">
-                    <div class="card-title">
-                        <i class="fas fa-history"></i>
-                        <span>Gönderim Geçmişi</span>
-                    </div>
-                    
-                    <div id="historyList">
-                        <!-- Geçmiş buraya eklenecek -->
-                    </div>
+
+                <!-- Sidebar Actions -->
+                <div class="btn-row">
+                    <button class="btn btn-ghost btn-sm" id="testBtn"><i class="fas fa-vial"></i> Test</button>
+                    <button class="btn btn-ghost btn-sm" id="healthBtn"><i class="fas fa-heartbeat"></i> Sağlık</button>
+                    <button class="btn btn-ghost btn-sm" id="resetBtn"><i class="fas fa-trash-alt"></i> Sıfırla</button>
                 </div>
             </div>
         </div>
-        
-        <!-- Log Panel -->
-        <div class="log-panel">
-            <div class="log-header">
-                <div class="card-title">
-                    <i class="fas fa-clipboard-list"></i>
-                    <span>İşlem Logları</span>
-                </div>
-                <div class="action-buttons">
-                    <button class="btn btn-icon btn-secondary" id="downloadLogsBtn" title="Logları İndir">
-                        <i class="fas fa-download"></i>
-                    </button>
-                    <button class="btn btn-icon btn-secondary" id="clearLogsBtn" title="Logları Temizle">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
+
+        <!-- ═══ MAIN CONTENT ═══ -->
+        <div class="panel" style="background: var(--bg);">
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="links"><i class="fas fa-link"></i> Link</button>
+                <button class="tab-btn" data-tab="embed"><i class="fas fa-code"></i> Embed</button>
+                <button class="tab-btn" data-tab="files"><i class="fas fa-file-upload"></i> Dosya</button>
+                <button class="tab-btn" data-tab="history"><i class="fas fa-clock-rotate-left"></i> Geçmiş</button>
             </div>
-            
-            <div class="log-list" id="logList">
-                <!-- Loglar buraya eklenecek -->
+            <div class="panel-body">
+
+                <!-- ─── LINKS TAB ─── -->
+                <div class="tab-page active" id="linksTab">
+                    <div class="card">
+                        <div class="card-title"><i class="fas fa-plus-circle"></i> Yeni Link</div>
+                        <div class="field">
+                            <label>URL</label>
+                            <input type="text" id="linkUrl" placeholder="https://example.com/...">
+                        </div>
+                        <button class="btn btn-accent" id="addLinkBtn"><i class="fas fa-plus"></i> Ekle</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">
+                            <i class="fas fa-list"></i> Link Listesi
+                            <span style="margin-left:auto; font-size:0.7rem; color:var(--text3);"
+                                id="linkCount">0</span>
+                        </div>
+                        <div class="mode-toggle">
+                            <div class="mode-opt active" data-mode="single">Tekli</div>
+                            <div class="mode-opt" data-mode="batch">Toplu</div>
+                        </div>
+                        <div class="field">
+                            <label>Gecikme (ms)</label>
+                            <input type="number" id="linkDelay" value="1000" min="200" step="100">
+                        </div>
+                        <div id="linkList"></div>
+                        <div class="btn-row" style="margin-top:12px;">
+                            <button class="btn btn-green" id="sendLinksBtn"><i class="fas fa-paper-plane"></i>
+                                Gönder</button>
+                            <button class="btn btn-red" id="clearLinksBtn"><i class="fas fa-trash"></i> Temizle</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ─── EMBED TAB ─── -->
+                <div class="tab-page" id="embedTab">
+                    <div class="card">
+                        <div class="card-title"><i class="fas fa-bookmark"></i> Şablonlar</div>
+                        <div style="display:flex; gap:8px; margin-bottom:8px;">
+                            <input type="text" id="templateName" placeholder="Şablon adı..."
+                                style="flex:1; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:7px 10px; border-radius:6px; font-size:0.78rem; font-family:inherit; outline:none;">
+                            <button class="btn btn-ghost btn-sm" id="saveTemplateBtn"><i
+                                    class="fas fa-save"></i></button>
+                        </div>
+                        <div id="templateList"></div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title"><i class="fas fa-magic"></i> Embed Oluşturucu</div>
+                        <div class="field">
+                            <label>Başlık</label>
+                            <input type="text" id="embedTitle" placeholder="Embed başlığı...">
+                        </div>
+                        <div class="field">
+                            <label>Açıklama</label>
+                            <textarea id="embedDesc" rows="3"
+                                placeholder="Açıklama... {time}, {date} gibi değişkenler kullanabilirsiniz."></textarea>
+                        </div>
+                        <div class="field">
+                            <label>Renk</label>
+                            <input type="color" id="embedColor" value="#5865f2"
+                                style="height:36px; padding:2px; cursor:pointer;">
+                        </div>
+
+                        <div class="section-label" style="margin-top:14px;"><i class="fas fa-eye"></i> Önizleme</div>
+                        <div class="embed-preview" id="embedPreview">
+                            <div class="ep-title" id="previewTitle">Başlık</div>
+                            <div class="ep-desc" id="previewDesc">Açıklama burada görünecek...</div>
+                        </div>
+
+                        <div class="btn-row" style="margin-top:14px;">
+                            <button class="btn btn-accent" id="sendEmbedBtn"><i class="fas fa-paper-plane"></i> Embed
+                                Gönder</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ─── FILES TAB ─── -->
+                <div class="tab-page" id="filesTab">
+                    <div class="card">
+                        <div class="card-title"><i class="fas fa-cloud-upload-alt"></i> Dosya Yükle</div>
+                        <div class="dropzone" id="dropzone">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Sürükle & Bırak veya tıkla (maks 25MB)</p>
+                        </div>
+                        <input type="file" id="fileInput" multiple hidden>
+
+                        <div class="mode-toggle">
+                            <div class="mode-opt active" data-mode="single">Tekli</div>
+                            <div class="mode-opt" data-mode="batch">Toplu</div>
+                        </div>
+                        <div class="field">
+                            <label>Gecikme (ms)</label>
+                            <input type="number" id="fileDelay" value="2000" min="500" step="500">
+                        </div>
+                        <div id="fileList"></div>
+                        <div class="btn-row" style="margin-top:12px;">
+                            <button class="btn btn-green" id="sendFilesBtn"><i class="fas fa-paper-plane"></i>
+                                Gönder</button>
+                            <button class="btn btn-red" id="clearFilesBtn"><i class="fas fa-trash"></i> Temizle</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ─── HISTORY TAB ─── -->
+                <div class="tab-page" id="historyTab">
+                    <div class="card">
+                        <div class="card-title"><i class="fas fa-clock-rotate-left"></i> Gönderim Geçmişi</div>
+                        <div id="historyList"></div>
+                    </div>
+                </div>
+
             </div>
+        </div>
+
+        <!-- ═══ LOG PANEL ═══ -->
+        <div class="panel">
+            <div class="panel-header">
+                <i class="fas fa-terminal"></i>
+                Loglar
+                <span style="margin-left:auto; display:flex; gap:6px;">
+                    <button class="btn btn-ghost btn-sm" id="downloadLogsBtn" title="İndir"><i
+                            class="fas fa-download"></i></button>
+                    <button class="btn btn-ghost btn-sm" id="clearLogsBtn" title="Temizle"><i
+                            class="fas fa-trash"></i></button>
+                </span>
+            </div>
+            <div class="panel-body" id="logList"></div>
         </div>
     </div>
 
-    <!-- Bildirimler -->
-    <div id="notificationContainer"></div>
+    <!-- Footer -->
+    <div class="footer">Created by <strong>Zywexx</strong> • Powered by <strong>787</strong></div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
 
     <script>
-        // Uygulama durumu
+        // ═══════════════════════════════════════════════
+        // STATE
+        // ═══════════════════════════════════════════════
         const state = {
-            webhooks: JSON.parse(localStorage.getItem('webhooks')) || [],
+            webhooks: JSON.parse(localStorage.getItem('wh_webhooks')) || [],
             activeWebhook: null,
-            links: JSON.parse(localStorage.getItem('links')) || [],
+            links: JSON.parse(localStorage.getItem('wh_links')) || [],
             files: [],
-            logs: JSON.parse(localStorage.getItem('logs')) || [],
-            history: JSON.parse(localStorage.getItem('history')) || [],
+            logs: JSON.parse(localStorage.getItem('wh_logs')) || [],
+            history: JSON.parse(localStorage.getItem('wh_history')) || [],
+            identity: JSON.parse(localStorage.getItem('wh_identity')) || { name: '', avatar: '' },
+            templates: JSON.parse(localStorage.getItem('wh_templates')) || [],
             proxyEnabled: false,
-            sendMode: 'single' // 'single' veya 'batch'
+            sendMode: 'single'
         };
 
-        // DOM Elementleri
+        // ═══════════════════════════════════════════════
+        // DOM
+        // ═══════════════════════════════════════════════
+        const $ = id => document.getElementById(id);
         const dom = {
-            // Webhook yönetimi
-            webhookUrl: document.getElementById('webhookUrl'),
-            webhookName: document.getElementById('webhookName'),
-            addWebhookBtn: document.getElementById('addWebhookBtn'),
-            webhookList: document.getElementById('webhookList'),
-            testWebhookBtn: document.getElementById('testWebhookBtn'),
-            clearStorageBtn: document.getElementById('clearStorageBtn'),
-            
-            // Proxy
-            proxyToggle: document.getElementById('proxyToggle'),
-            proxyContainer: document.getElementById('proxyContainer'),
-            proxyUrl: document.getElementById('proxyUrl'),
-            
-            // Link yönetimi
-            linkUrl: document.getElementById('linkUrl'),
-            addLinkBtn: document.getElementById('addLinkBtn'),
-            linkList: document.getElementById('linkList'),
-            linkCount: document.getElementById('linkCount'),
-            sendLinksBtn: document.getElementById('sendLinksBtn'),
-            clearLinksBtn: document.getElementById('clearLinksBtn'),
-            
-            // Dosya yönetimi
-            dropzone: document.getElementById('dropzone'),
-            fileInput: document.getElementById('fileInput'),
-            fileList: document.getElementById('fileList'),
-            sendFilesBtn: document.getElementById('sendFilesBtn'),
-            clearFilesBtn: document.getElementById('clearFilesBtn'),
-            
-            // Loglar
-            logList: document.getElementById('logList'),
-            downloadLogsBtn: document.getElementById('downloadLogsBtn'),
-            clearLogsBtn: document.getElementById('clearLogsBtn'),
-            
-            // Tema
-            themeToggle: document.getElementById('themeToggle'),
-            
-            // Tab'lar
-            tabs: document.querySelectorAll('.tab'),
-            tabContents: document.querySelectorAll('.tab-content'),
-            
-            // Mod seçici
-            modeButtons: document.querySelectorAll('.mode-btn'),
-            
-            // Geçmiş
-            historyList: document.getElementById('historyList')
+            identityName: $('identityName'),
+            identityAvatar: $('identityAvatar'),
+            webhookUrl: $('webhookUrl'),
+            webhookName: $('webhookName'),
+            addWebhookBtn: $('addWebhookBtn'),
+            webhookList: $('webhookList'),
+            proxyToggle: $('proxyToggle'),
+            proxyBox: $('proxyBox'),
+            proxyUrl: $('proxyUrl'),
+            testBtn: $('testBtn'),
+            healthBtn: $('healthBtn'),
+            resetBtn: $('resetBtn'),
+            linkUrl: $('linkUrl'),
+            addLinkBtn: $('addLinkBtn'),
+            linkCount: $('linkCount'),
+            linkDelay: $('linkDelay'),
+            linkList: $('linkList'),
+            sendLinksBtn: $('sendLinksBtn'),
+            clearLinksBtn: $('clearLinksBtn'),
+            embedTitle: $('embedTitle'),
+            embedDesc: $('embedDesc'),
+            embedColor: $('embedColor'),
+            embedPreview: $('embedPreview'),
+            previewTitle: $('previewTitle'),
+            previewDesc: $('previewDesc'),
+            sendEmbedBtn: $('sendEmbedBtn'),
+            templateName: $('templateName'),
+            saveTemplateBtn: $('saveTemplateBtn'),
+            templateList: $('templateList'),
+            dropzone: $('dropzone'),
+            fileInput: $('fileInput'),
+            fileDelay: $('fileDelay'),
+            fileList: $('fileList'),
+            sendFilesBtn: $('sendFilesBtn'),
+            clearFilesBtn: $('clearFilesBtn'),
+            historyList: $('historyList'),
+            logList: $('logList'),
+            downloadLogsBtn: $('downloadLogsBtn'),
+            clearLogsBtn: $('clearLogsBtn'),
+            toastContainer: $('toastContainer'),
+            tabs: document.querySelectorAll('.tab-btn'),
+            tabPages: document.querySelectorAll('.tab-page'),
+            modeOpts: document.querySelectorAll('.mode-opt')
         };
 
-        // Yardımcı Fonksiyonlar
+        // ═══════════════════════════════════════════════
+        // HELPERS
+        // ═══════════════════════════════════════════════
         const helpers = {
-            // Tema kontrolü
-            initTheme: function() {
-                const savedTheme = localStorage.getItem('theme') || 'dark';
-                document.documentElement.setAttribute('data-theme', savedTheme);
-                dom.themeToggle.checked = savedTheme === 'light';
+            save() {
+                localStorage.setItem('wh_webhooks', JSON.stringify(state.webhooks));
+                localStorage.setItem('wh_links', JSON.stringify(state.links));
+                localStorage.setItem('wh_history', JSON.stringify(state.history));
+                localStorage.setItem('wh_identity', JSON.stringify(state.identity));
+                localStorage.setItem('wh_templates', JSON.stringify(state.templates));
             },
-
-            // Bildirim göster
-            showNotification: function(message, type = 'info') {
-                const container = document.getElementById('notificationContainer');
-                const notification = document.createElement('div');
-                notification.className = `notification notification-${type}`;
-                
-                let icon = 'fa-info-circle';
-                if (type === 'success') icon = 'fa-check-circle';
-                if (type === 'error') icon = 'fa-exclamation-circle';
-                if (type === 'warning') icon = 'fa-exclamation-triangle';
-                
-                notification.innerHTML = `
-                    <i class="fas ${icon}"></i>
-                    <span>${message}</span>
-                `;
-                
-                container.appendChild(notification);
-                
-                // 5 saniye sonra kaldır
-                setTimeout(() => {
-                    notification.classList.add('hide');
-                    setTimeout(() => notification.remove(), 300);
-                }, 5000);
+            saveLogs() {
+                localStorage.setItem('wh_logs', JSON.stringify(state.logs));
             },
-
-            // Log ekle
-            addLog: function(message, type = 'info') {
-                const logEntry = {
-                    id: Date.now(),
-                    time: new Date().toLocaleTimeString(),
-                    message,
-                    type
-                };
-                
-                state.logs.unshift(logEntry);
-                if (state.logs.length > 100) state.logs.pop(); // En fazla 100 log
+            toast(msg, type = 'info') {
+                const el = document.createElement('div');
+                el.className = `toast ${type}`;
+                const icons = { success: 'fa-check-circle', error: 'fa-times-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle' };
+                el.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i><span>${msg}</span>`;
+                dom.toastContainer.appendChild(el);
+                setTimeout(() => { el.classList.add('hide'); setTimeout(() => el.remove(), 250); }, 4000);
+            },
+            log(msg, type = 'info') {
+                const entry = { id: Date.now(), time: new Date().toLocaleTimeString(), message: msg, type };
+                state.logs.unshift(entry);
+                if (state.logs.length > 100) state.logs.pop();
                 this.saveLogs();
                 this.renderLogs();
             },
-
-            // Logları render et
-            renderLogs: function() {
-                dom.logList.innerHTML = '';
-                
-                if (state.logs.length === 0) {
-                    dom.logList.innerHTML = '<div class="empty-state"><i class="fas fa-clipboard"></i><p>Henüz log yok</p></div>';
+            renderLogs() {
+                if (!state.logs.length) {
+                    dom.logList.innerHTML = '<div class="empty"><i class="fas fa-terminal"></i><p>Log yok</p></div>';
                     return;
                 }
-                
-                state.logs.forEach(log => {
-                    const logElement = document.createElement('div');
-                    logElement.className = `log-entry log-${log.type}`;
-                    logElement.innerHTML = `
-                        <span class="log-time">[${log.time}]</span>
-                        <span>${log.message}</span>
-                    `;
-                    dom.logList.appendChild(logElement);
-                });
+                dom.logList.innerHTML = state.logs.map(l =>
+                    `<div class="log-entry ${l.type}"><span class="log-time">${l.time}</span><span class="log-msg">${l.message}</span></div>`
+                ).join('');
             },
-
-            // State'i kaydet
-            saveState: function() {
-                localStorage.setItem('webhooks', JSON.stringify(state.webhooks));
-                localStorage.setItem('links', JSON.stringify(state.links));
-                localStorage.setItem('history', JSON.stringify(state.history));
+            vars(text) {
+                if (!text) return '';
+                const now = new Date();
+                return text
+                    .replaceAll('{time}', now.toLocaleTimeString())
+                    .replaceAll('{date}', now.toLocaleDateString())
+                    .replaceAll('{datetime}', now.toLocaleString())
+                    .replaceAll('{webhook_name}', state.activeWebhook?.name || 'Webhook')
+                    .replaceAll('{user}', state.identity.name || '787 User');
             },
-
-            // Logları kaydet
-            saveLogs: function() {
-                localStorage.setItem('logs', JSON.stringify(state.logs));
-            },
-
-            // Link tipini belirle
-            detectLinkType: function(url) {
-                const youtubeRegex = /(youtube\.com|youtu\.be)/;
-                const imageRegex = /\.(jpg|jpeg|png|gif|webp|bmp)(\?.*)?$/i;
-                const videoRegex = /\.(mp4|webm|mov|avi|mkv)(\?.*)?$/i;
-                const audioRegex = /\.(mp3|wav|ogg|flac)(\?.*)?$/i;
-                const pdfRegex = /\.pdf(\?.*)?$/i;
-                
-                if (youtubeRegex.test(url)) return 'YouTube';
-                if (imageRegex.test(url)) return 'Resim';
-                if (videoRegex.test(url)) return 'Video';
-                if (audioRegex.test(url)) return 'Ses';
-                if (pdfRegex.test(url)) return 'PDF';
-                
+            linkType(url) {
+                if (/(youtube\.com|youtu\.be)/.test(url)) return 'YouTube';
+                if (/\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(url)) return 'Resim';
+                if (/\.(mp4|webm|mov)(\?.*)?$/i.test(url)) return 'Video';
+                if (/\.(mp3|wav|ogg)(\?.*)?$/i.test(url)) return 'Ses';
+                if (/\.pdf(\?.*)?$/i.test(url)) return 'PDF';
                 return 'Link';
             },
-
-            // Dosya boyutunu formatla
-            formatFileSize: function(bytes) {
-                if (bytes === 0) return '0 Bytes';
-                const k = 1024;
-                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            fileSize(bytes) {
+                if (!bytes) return '0 B';
+                const k = 1024, s = ['B', 'KB', 'MB', 'GB'];
                 const i = Math.floor(Math.log(bytes) / Math.log(k));
-                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+                return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + s[i];
             },
-
-            // Dosya ikonunu belirle
-            getFileIcon: function(filename) {
-                const ext = filename.split('.').pop().toLowerCase();
-                const icons = {
-                    jpg: 'fa-file-image', jpeg: 'fa-file-image', png: 'fa-file-image',
-                    gif: 'fa-file-image', webp: 'fa-file-image', bmp: 'fa-file-image',
+            fileIcon(name) {
+                const ext = name.split('.').pop().toLowerCase();
+                const map = {
+                    jpg: 'fa-file-image', jpeg: 'fa-file-image', png: 'fa-file-image', gif: 'fa-file-image', webp: 'fa-file-image',
                     mp4: 'fa-file-video', webm: 'fa-file-video', mov: 'fa-file-video',
-                    avi: 'fa-file-video', mkv: 'fa-file-video',
                     mp3: 'fa-file-audio', wav: 'fa-file-audio', ogg: 'fa-file-audio',
-                    pdf: 'fa-file-pdf',
-                    zip: 'fa-file-archive', rar: 'fa-file-archive', '7z': 'fa-file-archive',
-                    txt: 'fa-file-alt', doc: 'fa-file-word', docx: 'fa-file-word',
-                    xls: 'fa-file-excel', xlsx: 'fa-file-excel',
-                    ppt: 'fa-file-powerpoint', pptx: 'fa-file-powerpoint'
+                    pdf: 'fa-file-pdf', zip: 'fa-file-archive', rar: 'fa-file-archive',
+                    txt: 'fa-file-alt', doc: 'fa-file-word', docx: 'fa-file-word'
                 };
-                
-                return icons[ext] || 'fa-file';
-            }
+                return map[ext] || 'fa-file';
+            },
+            getSenderName() { return state.identity.name || '787'; },
+            getSenderAvatar() { return state.identity.avatar || 'https://cdn.discordapp.com/attachments/1308901267845677237/1457076691112296520/787_duz.png?ex=699dec6a&is=699c9aea&hm=a2f563baa89848df6fda49e5380ea4a8fc3b6bd6c827ddbb127d903f7f75b449&'; }
         };
 
-        // Webhook Yönetimi
+        // ═══════════════════════════════════════════════
+        // WEBHOOK MANAGER
+        // ═══════════════════════════════════════════════
         const webhookManager = {
-            // Webhook ekle
-            addWebhook: function() {
+            add() {
                 const url = dom.webhookUrl.value.trim();
                 const name = dom.webhookName.value.trim() || 'Webhook';
-                
-                if (!url) {
-                    helpers.showNotification('Webhook URL boş olamaz', 'error');
-                    return;
-                }
-                
-                // Discord webhook URL kontrolü
-                if (!url.includes('discord.com/api/webhooks/')) {
-                    helpers.showNotification('Geçerli bir Discord webhook URL\'si girin', 'warning');
-                }
-                
-                const webhook = {
-                    id: Date.now(),
-                    name,
-                    url,
-                    date: new Date().toLocaleString()
-                };
-                
-                state.webhooks.push(webhook);
-                state.activeWebhook = webhook;
-                
-                helpers.saveState();
-                this.renderWebhooks();
-                
-                dom.webhookUrl.value = '';
-                dom.webhookName.value = '';
-                
-                helpers.showNotification(`"${name}" webhook'u eklendi`, 'success');
-                helpers.addLog(`"${name}" webhook'u eklendi`, 'success');
+                if (!url) return helpers.toast('URL boş', 'error');
+                if (!url.includes('discord.com/api/webhooks/')) helpers.toast('Discord webhook URL\'si değil', 'warning');
+                const wh = { id: Date.now(), name, url, date: new Date().toLocaleString() };
+                state.webhooks.push(wh);
+                state.activeWebhook = wh;
+                helpers.save(); this.render();
+                dom.webhookUrl.value = ''; dom.webhookName.value = '';
+                helpers.toast(`"${name}" eklendi`, 'success');
+                helpers.log(`"${name}" webhook eklendi`, 'success');
             },
-
-            // Webhook'ları render et
-            renderWebhooks: function() {
-                dom.webhookList.innerHTML = '';
-                
-                if (state.webhooks.length === 0) {
-                    dom.webhookList.innerHTML = '<div class="empty-state"><i class="fas fa-link"></i><p>Henüz webhook eklenmedi</p></div>';
-                    return;
-                }
-                
-                state.webhooks.forEach(webhook => {
-                    const webhookElement = document.createElement('div');
-                    webhookElement.className = `webhook-item ${state.activeWebhook?.id === webhook.id ? 'active' : ''}`;
-                    webhookElement.innerHTML = `
-                        <div class="webhook-name">
-                            <span>${webhook.name}</span>
-                            <i class="fas fa-trash delete-webhook" data-id="${webhook.id}"></i>
-                        </div>
-                        <div class="webhook-url">${webhook.url}</div>
-                    `;
-                    
-                    // Tıklama olayı
-                    webhookElement.addEventListener('click', (e) => {
-                        if (!e.target.classList.contains('delete-webhook')) {
-                            state.activeWebhook = webhook;
-                            this.renderWebhooks();
-                            helpers.showNotification(`"${webhook.name}" aktif webhook olarak ayarlandı`, 'info');
-                        }
-                    });
-                    
-                    // Silme butonu
-                    const deleteBtn = webhookElement.querySelector('.delete-webhook');
-                    deleteBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        this.deleteWebhook(webhook.id);
-                    });
-                    
-                    dom.webhookList.appendChild(webhookElement);
-                });
-            },
-
-            // Webhook sil
-            deleteWebhook: function(id) {
+            delete(id) {
                 state.webhooks = state.webhooks.filter(w => w.id !== id);
-                
-                if (state.activeWebhook?.id === id) {
-                    state.activeWebhook = state.webhooks[0] || null;
-                }
-                
-                helpers.saveState();
-                this.renderWebhooks();
-                helpers.showNotification('Webhook silindi', 'info');
-                helpers.addLog('Webhook silindi', 'info');
+                if (state.activeWebhook?.id === id) state.activeWebhook = state.webhooks[0] || null;
+                helpers.save(); this.render();
+                helpers.toast('Webhook silindi', 'info');
+                helpers.log('Webhook silindi', 'info');
             },
-
-            // Webhook test et
-            testWebhook: async function() {
-                if (!state.activeWebhook) {
-                    helpers.showNotification('Önce bir webhook seçin', 'error');
+            render() {
+                if (!state.webhooks.length) {
+                    dom.webhookList.innerHTML = '<div class="empty"><i class="fas fa-plug"></i><p>Webhook yok</p></div>';
                     return;
                 }
-                
-                try {
-                    const response = await this.sendWebhookRequest({
-                        content: '✅ Webhook test başarılı!',
-                        username: 'Webhook Tester',
-                        avatar_url: 'https://cdn.discordapp.com/embed/avatars/0.png'
+                dom.webhookList.innerHTML = '';
+                state.webhooks.forEach(wh => {
+                    const el = document.createElement('div');
+                    el.className = `wh-item ${state.activeWebhook?.id === wh.id ? 'active' : ''}`;
+                    el.innerHTML = `<div class="wh-dot"></div><div class="wh-info"><div class="wh-name">${wh.name}</div><div class="wh-url">${wh.url}</div></div><div class="wh-del" data-id="${wh.id}"><i class="fas fa-trash-alt"></i></div>`;
+                    el.addEventListener('click', e => {
+                        if (e.target.closest('.wh-del')) { this.delete(wh.id); return; }
+                        state.activeWebhook = wh; this.render();
+                        helpers.toast(`"${wh.name}" aktif`, 'info');
                     });
-                    
-                    if (response.ok) {
-                        helpers.showNotification('Webhook testi başarılı', 'success');
-                        helpers.addLog(`"${state.activeWebhook.name}" webhook testi başarılı`, 'success');
-                    } else {
-                        throw new Error(`HTTP ${response.status}`);
-                    }
-                } catch (error) {
-                    helpers.showNotification(`Webhook testi başarısız: ${error.message}`, 'error');
-                    helpers.addLog(`"${state.activeWebhook.name}" webhook testi başarısız: ${error.message}`, 'error');
-                }
+                    dom.webhookList.appendChild(el);
+                });
             },
-
-            // Webhook isteği gönder
-            sendWebhookRequest: async function(data) {
-                if (!state.activeWebhook) {
-                    throw new Error('Aktif webhook yok');
-                }
-                
+            async send(data) {
+                if (!state.activeWebhook) throw new Error('Aktif webhook yok');
                 const url = state.activeWebhook.url;
-                const options = {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                };
-                
-                // Proxy desteği
+                const opts = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) };
                 if (state.proxyEnabled && dom.proxyUrl.value.trim()) {
-                    const proxyUrl = dom.proxyUrl.value.trim();
-                    // Proxy için özel istek yapısı (basit bir örnek)
-                    options.headers['X-Target-URL'] = url;
-                    return fetch(proxyUrl, options);
+                    opts.headers['X-Target-URL'] = url;
+                    return fetch(dom.proxyUrl.value.trim(), opts);
                 }
-                
-                return fetch(url, options);
+                return fetch(url, opts);
             },
-
-            // Storage'ı temizle
-            clearStorage: function() {
-                if (confirm('Tüm webhook\'lar, linkler ve geçmiş silinecek. Emin misiniz?')) {
-                    localStorage.clear();
-                    state.webhooks = [];
-                    state.activeWebhook = null;
-                    state.links = [];
-                    state.history = [];
-                    state.logs = [];
-                    
-                    this.renderWebhooks();
-                    linkManager.renderLinks();
-                    fileManager.renderFiles();
-                    helpers.renderLogs();
-                    historyManager.renderHistory();
-                    
-                    helpers.showNotification('Tüm veriler temizlendi', 'info');
-                }
+            async test() {
+                if (!state.activeWebhook) return helpers.toast('Webhook seçin', 'error');
+                try {
+                    const r = await this.send({ content: '✅ **787** Test Başarılı!', username: helpers.getSenderName(), avatar_url: helpers.getSenderAvatar() });
+                    if (r.ok) { helpers.toast('Test başarılı', 'success'); helpers.log('Webhook testi başarılı', 'success'); }
+                    else throw new Error(`HTTP ${r.status}`);
+                } catch (e) { helpers.toast(`Test başarısız: ${e.message}`, 'error'); helpers.log(`Test başarısız: ${e.message}`, 'error'); }
+            },
+            async health() {
+                if (!state.activeWebhook) return helpers.toast('Webhook seçin', 'error');
+                try {
+                    const r = await fetch(state.activeWebhook.url);
+                    if (r.ok) { helpers.toast(`"${state.activeWebhook.name}" sağlıklı`, 'success'); helpers.log('Sağlık: OK', 'success'); }
+                    else throw new Error(`HTTP ${r.status}`);
+                } catch (e) { helpers.toast(`Çevrimdışı: ${e.message}`, 'error'); helpers.log(`Sağlık: FAIL - ${e.message}`, 'error'); }
+            },
+            reset() {
+                if (!confirm('Tüm veriler silinecek. Emin misiniz?')) return;
+                localStorage.clear();
+                state.webhooks = []; state.activeWebhook = null;
+                state.links = []; state.history = []; state.logs = []; state.templates = [];
+                state.identity = { name: '', avatar: '' };
+                dom.identityName.value = ''; dom.identityAvatar.value = '';
+                this.render(); linkManager.render(); fileManager.render(); helpers.renderLogs(); historyManager.render(); embedManager.renderTemplates();
+                helpers.toast('Tüm veriler silindi', 'info');
             }
         };
 
-        // Link Yönetimi
+        // ═══════════════════════════════════════════════
+        // EMBED MANAGER
+        // ═══════════════════════════════════════════════
+        const embedManager = {
+            updatePreview() {
+                const t = helpers.vars(dom.embedTitle.value) || 'Başlık';
+                const d = helpers.vars(dom.embedDesc.value) || 'Açıklama burada görünecek...';
+                dom.previewTitle.textContent = t;
+                dom.previewDesc.textContent = d;
+                dom.embedPreview.style.borderLeftColor = dom.embedColor.value;
+            },
+            async sendEmbed() {
+                if (!state.activeWebhook) return helpers.toast('Webhook seçin', 'error');
+                const title = helpers.vars(dom.embedTitle.value);
+                const desc = helpers.vars(dom.embedDesc.value);
+                const color = parseInt(dom.embedColor.value.replace('#', ''), 16);
+                if (!title && !desc) return helpers.toast('Başlık veya açıklama girin', 'warning');
+                try {
+                    const r = await webhookManager.send({
+                        username: helpers.getSenderName(),
+                        avatar_url: helpers.getSenderAvatar(),
+                        embeds: [{ title, description: desc, color, timestamp: new Date().toISOString() }]
+                    });
+                    if (r.ok) { helpers.toast('Embed gönderildi', 'success'); helpers.log('Embed gönderildi', 'success'); historyManager.add('embed', 1); }
+                    else throw new Error(`HTTP ${r.status}`);
+                } catch (e) { helpers.toast(`Embed hatası: ${e.message}`, 'error'); helpers.log(`Embed hatası: ${e.message}`, 'error'); }
+            },
+            saveTemplate() {
+                const name = dom.templateName.value.trim();
+                if (!name) return helpers.toast('Şablon adı girin', 'warning');
+                state.templates.push({ id: Date.now(), name, title: dom.embedTitle.value, description: dom.embedDesc.value, color: dom.embedColor.value });
+                helpers.save(); this.renderTemplates();
+                dom.templateName.value = '';
+                helpers.toast(`"${name}" kaydedildi`, 'success');
+            },
+            loadTemplate(t) {
+                dom.embedTitle.value = t.title;
+                dom.embedDesc.value = t.description;
+                dom.embedColor.value = t.color;
+                this.updatePreview();
+                helpers.toast(`"${t.name}" yüklendi`, 'info');
+            },
+            deleteTemplate(id) {
+                state.templates = state.templates.filter(t => t.id !== id);
+                helpers.save(); this.renderTemplates();
+            },
+            renderTemplates() {
+                if (!state.templates.length) { dom.templateList.innerHTML = '<span style="font-size:0.72rem; color:var(--text3);">Henüz şablon yok</span>'; return; }
+                dom.templateList.innerHTML = '';
+                state.templates.forEach(t => {
+                    const pill = document.createElement('span');
+                    pill.className = 'pill';
+                    pill.innerHTML = `${t.name} <span class="pill-x"><i class="fas fa-times"></i></span>`;
+                    pill.addEventListener('click', e => {
+                        if (e.target.closest('.pill-x')) { this.deleteTemplate(t.id); return; }
+                        this.loadTemplate(t);
+                    });
+                    dom.templateList.appendChild(pill);
+                });
+            }
+        };
+
+        // ═══════════════════════════════════════════════
+        // LINK MANAGER
+        // ═══════════════════════════════════════════════
         const linkManager = {
-            // Link ekle
-            addLink: function() {
+            add() {
                 const url = dom.linkUrl.value.trim();
-                
-                if (!url) {
-                    helpers.showNotification('Link URL\'si boş olamaz', 'error');
-                    return;
-                }
-                
-                try {
-                    new URL(url);
-                } catch {
-                    helpers.showNotification('Geçerli bir URL girin', 'error');
-                    return;
-                }
-                
-                const linkType = helpers.detectLinkType(url);
-                const link = {
-                    id: Date.now(),
-                    url,
-                    type: linkType,
-                    title: url.split('/').pop() || 'Link',
-                    added: new Date().toLocaleString()
-                };
-                
-                // YouTube için özel başlık çekme (basit örnek)
-                if (linkType === 'YouTube') {
-                    link.title = 'YouTube Videosu';
-                    link.thumbnail = 'https://img.youtube.com/vi/' + (url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/)?.[1] || '') + '/default.jpg';
-                }
-                
-                state.links.push(link);
-                helpers.saveState();
-                this.renderLinks();
-                
+                if (!url) return helpers.toast('URL boş', 'error');
+                try { new URL(url); } catch { return helpers.toast('Geçersiz URL', 'error'); }
+                const type = helpers.linkType(url);
+                state.links.push({ id: Date.now(), url, type, title: url.split('/').pop() || 'Link' });
+                helpers.save(); this.render();
                 dom.linkUrl.value = '';
-                helpers.showNotification(`"${linkType}" linki eklendi`, 'success');
-                helpers.addLog(`"${linkType}" linki eklendi: ${url}`, 'info');
+                helpers.toast(`${type} eklendi`, 'success');
+                helpers.log(`Link eklendi: ${url}`, 'info');
             },
-
-            // Linkleri render et
-            renderLinks: function() {
-                dom.linkList.innerHTML = '';
-                dom.linkCount.textContent = `${state.links.length} link`;
-                
-                if (state.links.length === 0) {
-                    dom.linkList.innerHTML = '<div class="empty-state"><i class="fas fa-link"></i><p>Henüz link eklenmedi</p></div>';
-                    return;
-                }
-                
-                state.links.forEach(link => {
-                    const linkElement = document.createElement('div');
-                    linkElement.className = 'link-item';
-                    linkElement.innerHTML = `
-                        <div class="link-info">
-                            <div class="link-preview">
-                                ${link.thumbnail ? 
-                                    `<img src="${link.thumbnail}" alt="Önizleme" style="width:100%;height:100%;object-fit:cover;border-radius:4px;">` : 
-                                    `<i class="fas ${link.type === 'YouTube' ? 'fa-youtube' : 
-                                        link.type === 'Resim' ? 'fa-image' : 
-                                        link.type === 'Video' ? 'fa-video' : 
-                                        link.type === 'Ses' ? 'fa-music' : 
-                                        link.type === 'PDF' ? 'fa-file-pdf' : 'fa-link'}"></i>`
-                                }
-                            </div>
-                            <div class="link-details">
-                                <div class="link-title">${link.title}</div>
-                                <div class="link-url">${link.url}</div>
-                            </div>
-                            <div class="link-type">${link.type}</div>
-                        </div>
-                        <button class="btn btn-icon btn-secondary delete-link" data-id="${link.id}">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    `;
-                    
-                    // Silme butonu
-                    const deleteBtn = linkElement.querySelector('.delete-link');
-                    deleteBtn.addEventListener('click', () => {
-                        this.deleteLink(link.id);
-                    });
-                    
-                    dom.linkList.appendChild(linkElement);
-                });
-            },
-
-            // Link sil
-            deleteLink: function(id) {
+            delete(id) {
                 state.links = state.links.filter(l => l.id !== id);
-                helpers.saveState();
-                this.renderLinks();
-                helpers.showNotification('Link silindi', 'info');
-                helpers.addLog('Link silindi', 'info');
+                helpers.save(); this.render();
             },
-
-            // Linkleri gönder
-            sendLinks: async function() {
-                if (!state.activeWebhook) {
-                    helpers.showNotification('Önce bir webhook seçin', 'error');
-                    return;
-                }
-                
-                if (state.links.length === 0) {
-                    helpers.showNotification('Gönderilecek link yok', 'warning');
-                    return;
-                }
-                
-                const mode = state.sendMode;
-                
-                if (mode === 'single') {
-                    // Tek tek gönder
+            render() {
+                dom.linkCount.textContent = state.links.length;
+                if (!state.links.length) { dom.linkList.innerHTML = '<div class="empty"><i class="fas fa-link"></i><p>Link yok</p></div>'; return; }
+                dom.linkList.innerHTML = '';
+                state.links.forEach(link => {
+                    const el = document.createElement('div');
+                    el.className = 'list-item';
+                    el.innerHTML = `<i class="fas fa-link" style="color:var(--accent);"></i><div class="info"><div class="title">${link.title}</div><div class="sub">${link.url}</div></div><span class="badge">${link.type}</span><div class="wh-del" style="cursor:pointer;"><i class="fas fa-trash-alt"></i></div>`;
+                    el.querySelector('.wh-del').addEventListener('click', () => this.delete(link.id));
+                    dom.linkList.appendChild(el);
+                });
+            },
+            async send() {
+                if (!state.activeWebhook) return helpers.toast('Webhook seçin', 'error');
+                if (!state.links.length) return helpers.toast('Link yok', 'warning');
+                const delay = parseInt(dom.linkDelay.value) || 1000;
+                if (state.sendMode === 'single') {
                     for (const link of state.links) {
-                        await this.sendSingleLink(link);
-                        // Her gönderim arasında 1 saniye bekle (rate limit)
-                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        try {
+                            const r = await webhookManager.send({ content: `🔗 ${link.url}`, username: helpers.getSenderName(), avatar_url: helpers.getSenderAvatar() });
+                            if (r.ok) helpers.log(`"${link.title}" gönderildi`, 'success');
+                            else throw new Error(`HTTP ${r.status}`);
+                        } catch (e) { helpers.log(`"${link.title}" hata: ${e.message}`, 'error'); }
+                        await new Promise(r => setTimeout(r, delay));
                     }
                 } else {
-                    // Toplu gönder (Discord embed sınırına dikkat)
-                    await this.sendBatchLinks();
+                    const text = state.links.map(l => `• ${l.url}`).join('\n');
+                    try {
+                        const r = await webhookManager.send({ content: `📎 **${state.links.length} link:**\n${text}`, username: helpers.getSenderName(), avatar_url: helpers.getSenderAvatar() });
+                        if (r.ok) helpers.log(`${state.links.length} link toplu gönderildi`, 'success');
+                        else throw new Error(`HTTP ${r.status}`);
+                    } catch (e) { helpers.log(`Toplu gönderim hatası: ${e.message}`, 'error'); }
                 }
-                
-                // Geçmişe ekle
-                historyManager.addToHistory('links', state.links.length);
+                historyManager.add('links', state.links.length);
+                helpers.log(`✅ Tüm linkler düştü! (${state.links.length} adet)`, 'success');
+                helpers.toast(`Tüm linkler düştü! (${state.links.length} adet)`, 'success');
             },
-
-            // Tek link gönder
-            sendSingleLink: async function(link) {
-                try {
-                    const data = {
-                        content: `🔗 ${link.url}`,
-                        username: '787 Link Gönderici',
-                        avatar_url: 'https://cdn.discordapp.com/attachments/1308901267845677237/1403801304425566230/787_bayrak.png?ex=69351918&is=6933c798&hm=8216da11cb9680f553d028147469639aac0dbe977b1dfc2ed9380e37fabc0b1d&'
-                    };
-                    
-                    // YouTube için embed
-                    if (link.type === 'YouTube') {
-                        data.embeds = [{
-                            title: link.title,
-                            url: link.url,
-                            color: 0xff0000,
-                            thumbnail: link.thumbnail ? { url: link.thumbnail } : undefined
-                        }];
-                    }
-                    
-                    const response = await webhookManager.sendWebhookRequest(data);
-                    
-                    if (response.ok) {
-                        helpers.addLog(`"${link.title}" gönderildi`, 'success');
-                    } else {
-                        throw new Error(`HTTP ${response.status}`);
-                    }
-                } catch (error) {
-                    helpers.addLog(`"${link.title}" gönderilemedi: ${error.message}`, 'error');
-                }
-            },
-
-            // Toplu link gönder
-            sendBatchLinks: async function() {
-                try {
-                    const linksText = state.links.map(link => `• ${link.url}`).join('\n');
-                    
-                    const data = {
-                        content: `📎 **${state.links.length} link gönderiliyor:**\n${linksText}`,
-                        username: '787 Link Gönderici',
-                        avatar_url: 'https://cdn.discordapp.com/attachments/1308901267845677237/1403801304425566230/787_bayrak.png?ex=69351918&is=6933c798&hm=8216da11cb9680f553d028147469639aac0dbe977b1dfc2ed9380e37fabc0b1d&'
-                    };
-                    
-                    const response = await webhookManager.sendWebhookRequest(data);
-                    
-                    if (response.ok) {
-                        helpers.showNotification(`${state.links.length} link gönderildi`, 'success');
-                        helpers.addLog(`${state.links.length} link toplu gönderildi`, 'success');
-                    } else {
-                        throw new Error(`HTTP ${response.status}`);
-                    }
-                } catch (error) {
-                    helpers.showNotification(`Linkler gönderilemedi: ${error.message}`, 'error');
-                    helpers.addLog(`Linkler toplu gönderilemedi: ${error.message}`, 'error');
-                }
-            },
-
-            // Link listesini temizle
-            clearLinks: function() {
-                if (state.links.length === 0) return;
-                
-                if (confirm(`${state.links.length} link silinecek. Emin misiniz?`)) {
-                    state.links = [];
-                    helpers.saveState();
-                    this.renderLinks();
-                    helpers.showNotification('Link listesi temizlendi', 'info');
-                    helpers.addLog('Link listesi temizlendi', 'info');
-                }
+            clear() {
+                if (!state.links.length) return;
+                if (!confirm(`${state.links.length} link silinecek?`)) return;
+                state.links = []; helpers.save(); this.render();
+                helpers.toast('Linkler temizlendi', 'info');
             }
         };
 
-        // Dosya Yönetimi
+        // ═══════════════════════════════════════════════
+        // FILE MANAGER
+        // ═══════════════════════════════════════════════
         const fileManager = {
-            // Dosya ekle
-            addFiles: function(fileList) {
-                const maxSize = 25 * 1024 * 1024; // 25MB
-                
+            add(fileList) {
+                const max = 25 * 1024 * 1024;
                 for (const file of fileList) {
-                    if (file.size > maxSize) {
-                        helpers.showNotification(`${file.name} dosyası çok büyük (max 25MB)`, 'error');
-                        continue;
-                    }
-                    
-                    const fileData = {
-                        id: Date.now() + Math.random(),
-                        file: file,
-                        name: file.name,
-                        size: file.size,
-                        type: file.type,
-                        progress: 0,
-                        status: 'pending'
-                    };
-                    
-                    state.files.push(fileData);
+                    if (file.size > max) { helpers.toast(`${file.name} çok büyük`, 'error'); continue; }
+                    state.files.push({ id: Date.now() + Math.random(), file, name: file.name, size: file.size, progress: 0, status: 'pending' });
                 }
-                
-                this.renderFiles();
-                helpers.showNotification(`${fileList.length} dosya eklendi`, 'success');
+                this.render();
+                helpers.toast(`${fileList.length} dosya eklendi`, 'success');
             },
-
-            // Dosyaları render et
-            renderFiles: function() {
-                dom.fileList.innerHTML = '';
-                
-                if (state.files.length === 0) {
-                    dom.fileList.innerHTML = '<div class="empty-state"><i class="fas fa-file-upload"></i><p>Henüz dosya eklenmedi</p></div>';
-                    return;
-                }
-                
-                state.files.forEach(fileData => {
-                    const fileElement = document.createElement('div');
-                    fileElement.className = 'file-item';
-                    fileElement.innerHTML = `
-                        <div class="file-info">
-                            <i class="fas ${helpers.getFileIcon(fileData.name)} file-icon"></i>
-                            <div class="file-details">
-                                <div class="file-name">${fileData.name}</div>
-                                <div class="file-size">${helpers.formatFileSize(fileData.size)}</div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: ${fileData.progress}%"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <button class="btn btn-icon btn-secondary remove-file" data-id="${fileData.id}">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    `;
-                    
-                    // Silme butonu
-                    const removeBtn = fileElement.querySelector('.remove-file');
-                    removeBtn.addEventListener('click', () => {
-                        this.removeFile(fileData.id);
-                    });
-                    
-                    dom.fileList.appendChild(fileElement);
-                });
-            },
-
-            // Dosya sil
-            removeFile: function(id) {
+            remove(id) {
                 state.files = state.files.filter(f => f.id !== id);
-                this.renderFiles();
-                helpers.showNotification('Dosya kaldırıldı', 'info');
+                this.render();
             },
-
-            // Dosyaları gönder
-            sendFiles: async function() {
-                if (!state.activeWebhook) {
-                    helpers.showNotification('Önce bir webhook seçin', 'error');
-                    return;
-                }
-                
-                if (state.files.length === 0) {
-                    helpers.showNotification('Gönderilecek dosya yok', 'warning');
-                    return;
-                }
-                
-                const mode = state.sendMode;
-                
-                if (mode === 'single') {
-                    // Tek tek gönder
-                    for (const fileData of state.files) {
-                        await this.sendSingleFile(fileData);
-                    }
-                } else {
-                    // Toplu gönder (Discord'a uygun değil, tek tek gönderilecek)
-                    helpers.showNotification('Dosyalar tek tek gönderiliyor...', 'info');
-                    for (const fileData of state.files) {
-                        await this.sendSingleFile(fileData);
-                    }
-                }
-                
-                // Geçmişe ekle
-                historyManager.addToHistory('files', state.files.length);
-            },
-
-            // Tek dosya gönder
-            sendSingleFile: async function(fileData) {
-                // Discord dosya gönderme FormData ile yapılır
-                const formData = new FormData();
-                formData.append('file', fileData.file);
-                formData.append('username', '787 Dosya Gönderici');
-                formData.append('avatar_url', 'https://cdn.discordapp.com/attachments/1308901267845677237/1403801304425566230/787_bayrak.png?ex=69351918&is=6933c798&hm=8216da11cb9680f553d028147469639aac0dbe977b1dfc2ed9380e37fabc0b1d&');
-                
-                try {
-                    const url = state.activeWebhook.url;
-                    
-                    // Proxy desteği
-                    let finalUrl = url;
-                    if (state.proxyEnabled && dom.proxyUrl.value.trim()) {
-                        // Proxy için özel işlem (bu örnekte basit tutuyoruz)
-                        finalUrl = dom.proxyUrl.value.trim();
-                        formData.append('target_url', url);
-                    }
-                    
-                    const response = await fetch(finalUrl, {
-                        method: 'POST',
-                        body: formData
-                    });
-                    
-                    if (response.ok) {
-                        fileData.progress = 100;
-                        fileData.status = 'sent';
-                        this.renderFiles();
-                        helpers.addLog(`"${fileData.name}" gönderildi`, 'success');
-                    } else {
-                        throw new Error(`HTTP ${response.status}`);
-                    }
-                } catch (error) {
-                    fileData.status = 'error';
-                    this.renderFiles();
-                    helpers.addLog(`"${fileData.name}" gönderilemedi: ${error.message}`, 'error');
-                }
-            },
-
-            // Dosya listesini temizle
-            clearFiles: function() {
-                if (state.files.length === 0) return;
-                
-                if (confirm(`${state.files.length} dosya kaldırılacak. Emin misiniz?`)) {
-                    state.files = [];
-                    this.renderFiles();
-                    helpers.showNotification('Dosya listesi temizlendi', 'info');
-                    helpers.addLog('Dosya listesi temizlendi', 'info');
-                }
-            }
-        };
-
-        // Geçmiş Yönetimi
-        const historyManager = {
-            // Geçmişe ekle
-            addToHistory: function(type, count) {
-                const entry = {
-                    id: Date.now(),
-                    type,
-                    count,
-                    date: new Date().toLocaleString(),
-                    webhook: state.activeWebhook?.name || 'Bilinmeyen'
-                };
-                
-                state.history.unshift(entry);
-                if (state.history.length > 50) state.history.pop(); // En fazla 50 kayıt
-                helpers.saveState();
-                this.renderHistory();
-            },
-
-            // Geçmişi render et
-            renderHistory: function() {
-                dom.historyList.innerHTML = '';
-                
-                if (state.history.length === 0) {
-                    dom.historyList.innerHTML = '<div class="empty-state"><i class="fas fa-history"></i><p>Henüz geçmiş yok</p></div>';
-                    return;
-                }
-                
-                state.history.forEach(entry => {
-                    const entryElement = document.createElement('div');
-                    entryElement.className = 'log-entry log-info';
-                    entryElement.innerHTML = `
-                        <span class="log-time">[${entry.date}]</span>
-                        <span>
-                            <strong>${entry.webhook}</strong> webhook'una 
-                            ${entry.type === 'links' ? `${entry.count} link` : `${entry.count} dosya`} gönderildi
-                        </span>
-                    `;
-                    dom.historyList.appendChild(entryElement);
+            render() {
+                if (!state.files.length) { dom.fileList.innerHTML = '<div class="empty"><i class="fas fa-file-upload"></i><p>Dosya yok</p></div>'; return; }
+                dom.fileList.innerHTML = '';
+                state.files.forEach(f => {
+                    const el = document.createElement('div');
+                    el.className = 'list-item';
+                    el.innerHTML = `<i class="fas ${helpers.fileIcon(f.name)}" style="color:var(--accent);"></i><div class="info"><div class="title">${f.name}</div><div class="sub">${helpers.fileSize(f.size)}</div><div class="progress"><div class="progress-fill" style="width:${f.progress}%"></div></div></div><div class="wh-del" style="cursor:pointer;"><i class="fas fa-trash-alt"></i></div>`;
+                    el.querySelector('.wh-del').addEventListener('click', () => this.remove(f.id));
+                    dom.fileList.appendChild(el);
                 });
-            }
-        };
-
-        // Log Yönetimi
-        const logManager = {
-            // Logları indir
-            downloadLogs: function() {
-                if (state.logs.length === 0) {
-                    helpers.showNotification('İndirilecek log yok', 'warning');
-                    return;
-                }
-                
-                const logText = state.logs.map(log => `[${log.time}] ${log.message}`).join('\n');
-                const blob = new Blob([logText], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `webhook-logs-${new Date().toISOString().slice(0, 10)}.txt`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                
-                helpers.showNotification('Loglar indirildi', 'success');
             },
-
-            // Logları temizle
-            clearLogs: function() {
-                if (state.logs.length === 0) return;
-                
-                if (confirm(`${state.logs.length} log silinecek. Emin misiniz?`)) {
-                    state.logs = [];
-                    helpers.saveLogs();
-                    helpers.renderLogs();
-                    helpers.showNotification('Loglar temizlendi', 'info');
-                }
-            }
-        };
-
-        // Event Listeners
-        const initEventListeners = function() {
-            // Tema değiştirme
-            dom.themeToggle.addEventListener('change', function() {
-                const theme = this.checked ? 'light' : 'dark';
-                document.documentElement.setAttribute('data-theme', theme);
-                localStorage.setItem('theme', theme);
-                helpers.showNotification(`${theme === 'light' ? 'Açık' : 'Koyu'} tema aktif`, 'info');
-            });
-
-            // Proxy toggle
-            dom.proxyToggle.addEventListener('change', function() {
-                state.proxyEnabled = this.checked;
-                dom.proxyContainer.style.display = this.checked ? 'block' : 'none';
-            });
-
-            // Webhook işlemleri
-            dom.addWebhookBtn.addEventListener('click', () => webhookManager.addWebhook());
-            dom.testWebhookBtn.addEventListener('click', () => webhookManager.testWebhook());
-            dom.clearStorageBtn.addEventListener('click', () => webhookManager.clearStorage());
-
-            // Link işlemleri
-            dom.addLinkBtn.addEventListener('click', () => linkManager.addLink());
-            dom.sendLinksBtn.addEventListener('click', () => linkManager.sendLinks());
-            dom.clearLinksBtn.addEventListener('click', () => linkManager.clearLinks());
-
-            // Dosya işlemleri
-            dom.dropzone.addEventListener('click', () => dom.fileInput.click());
-            dom.dropzone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                dom.dropzone.classList.add('dragover');
-            });
-            dom.dropzone.addEventListener('dragleave', () => {
-                dom.dropzone.classList.remove('dragover');
-            });
-            dom.dropzone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                dom.dropzone.classList.remove('dragover');
-                const files = e.dataTransfer.files;
-                fileManager.addFiles(files);
-            });
-            dom.fileInput.addEventListener('change', (e) => {
-                const files = e.target.files;
-                fileManager.addFiles(files);
-                dom.fileInput.value = '';
-            });
-            dom.sendFilesBtn.addEventListener('click', () => fileManager.sendFiles());
-            dom.clearFilesBtn.addEventListener('click', () => fileManager.clearFiles());
-
-            // Log işlemleri
-            dom.downloadLogsBtn.addEventListener('click', () => logManager.downloadLogs());
-            dom.clearLogsBtn.addEventListener('click', () => logManager.clearLogs());
-
-            // Tab değiştirme
-            dom.tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const tabId = tab.getAttribute('data-tab');
-                    
-                    // Aktif tab'ı güncelle
-                    dom.tabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    
-                    // Aktif içeriği göster
-                    dom.tabContents.forEach(content => {
-                        content.classList.remove('active');
-                        if (content.id === `${tabId}Tab`) {
-                            content.classList.add('active');
+            async send() {
+                if (!state.activeWebhook) return helpers.toast('Webhook seçin', 'error');
+                if (!state.files.length) return helpers.toast('Dosya yok', 'warning');
+                const delay = parseInt(dom.fileDelay.value) || 2000;
+                for (const f of state.files) {
+                    const form = new FormData();
+                    form.append('file', f.file);
+                    form.append('username', helpers.getSenderName());
+                    form.append('avatar_url', helpers.getSenderAvatar());
+                    try {
+                        let url = state.activeWebhook.url;
+                        if (state.proxyEnabled && dom.proxyUrl.value.trim()) {
+                            form.append('target_url', url);
+                            url = dom.proxyUrl.value.trim();
                         }
-                    });
-                });
-            });
-
-            // Mod değiştirme
-            dom.modeButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    dom.modeButtons.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    state.sendMode = btn.getAttribute('data-mode');
-                    helpers.showNotification(`${state.sendMode === 'single' ? 'Tekli' : 'Toplu'} gönderim modu aktif`, 'info');
-                });
-            });
-
-            // Enter tuşu ile link ekleme
-            dom.linkUrl.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    linkManager.addLink();
+                        const r = await fetch(url, { method: 'POST', body: form });
+                        if (r.ok) { f.progress = 100; f.status = 'sent'; this.render(); helpers.log(`"${f.name}" gönderildi`, 'success'); }
+                        else throw new Error(`HTTP ${r.status}`);
+                    } catch (e) { f.status = 'error'; this.render(); helpers.log(`"${f.name}" hata: ${e.message}`, 'error'); }
+                    await new Promise(r => setTimeout(r, delay));
                 }
-            });
-
-            // Enter tuşu ile webhook ekleme
-            dom.webhookUrl.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    webhookManager.addWebhook();
-                }
-            });
-        };
-
-        // Uygulamayı başlat
-        const initApp = function() {
-            // Tema ve state'i yükle
-            helpers.initTheme();
-            webhookManager.renderWebhooks();
-            linkManager.renderLinks();
-            fileManager.renderFiles();
-            helpers.renderLogs();
-            historyManager.renderHistory();
-            
-            // Event listener'ları ekle
-            initEventListeners();
-            
-            // Varsayılan webhook yoksa ekle
-            if (state.webhooks.length === 0) {
-                helpers.showNotification('Hoş geldiniz! İlk webhook\'unuzu ekleyerek başlayın.', 'info');
-                helpers.addLog('Uygulama başlatıldı', 'info');
-            } else {
-                // İlk webhook'u aktif yap
-                state.activeWebhook = state.webhooks[0];
-                webhookManager.renderWebhooks();
+                historyManager.add('files', state.files.length);
+                helpers.toast(`${state.files.length} dosya gönderildi`, 'success');
+            },
+            clear() {
+                if (!state.files.length) return;
+                if (!confirm(`${state.files.length} dosya kaldırılacak?`)) return;
+                state.files = []; this.render();
+                helpers.toast('Dosyalar temizlendi', 'info');
             }
-            
-            console.log('Webhook Gönderici uygulaması başlatıldı');
         };
 
-        // Uygulamayı başlat
-        document.addEventListener('DOMContentLoaded', initApp);
+        // ═══════════════════════════════════════════════
+        // HISTORY MANAGER
+        // ═══════════════════════════════════════════════
+        const historyManager = {
+            add(type, count) {
+                state.history.unshift({ id: Date.now(), type, count, date: new Date().toLocaleString(), webhook: state.activeWebhook?.name || '?' });
+                if (state.history.length > 50) state.history.pop();
+                helpers.save(); this.render();
+            },
+            render() {
+                if (!state.history.length) { dom.historyList.innerHTML = '<div class="empty"><i class="fas fa-clock-rotate-left"></i><p>Geçmiş yok</p></div>'; return; }
+                dom.historyList.innerHTML = state.history.map(h =>
+                    `<div class="log-entry success"><span class="log-time">${h.date}</span><span class="log-msg"><strong>${h.webhook}</strong> → ${h.count} ${h.type}</span></div>`
+                ).join('');
+            }
+        };
+
+        // ═══════════════════════════════════════════════
+        // LOG MANAGER
+        // ═══════════════════════════════════════════════
+        const logManager = {
+            download() {
+                if (!state.logs.length) return helpers.toast('Log yok', 'warning');
+                const text = state.logs.map(l => `[${l.time}] [${l.type}] ${l.message}`).join('\n');
+                const blob = new Blob([text], { type: 'text/plain' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `logs-${new Date().toISOString().slice(0, 10)}.txt`;
+                a.click(); URL.revokeObjectURL(a.href);
+                helpers.toast('Loglar indirildi', 'success');
+            },
+            clear() {
+                if (!state.logs.length) return;
+                if (!confirm('Loglar silinecek?')) return;
+                state.logs = []; helpers.saveLogs(); helpers.renderLogs();
+                helpers.toast('Loglar temizlendi', 'info');
+            }
+        };
+
+        // ═══════════════════════════════════════════════
+        // EVENT LISTENERS
+        // ═══════════════════════════════════════════════
+        function init() {
+            // Identity
+            dom.identityName.value = state.identity.name;
+            dom.identityAvatar.value = state.identity.avatar;
+            dom.identityName.addEventListener('input', e => { state.identity.name = e.target.value; helpers.save(); });
+            dom.identityAvatar.addEventListener('input', e => { state.identity.avatar = e.target.value; helpers.save(); });
+
+            // Proxy
+            dom.proxyToggle.addEventListener('change', function () { state.proxyEnabled = this.checked; dom.proxyBox.style.display = this.checked ? 'block' : 'none'; });
+
+            // Webhook
+            dom.addWebhookBtn.addEventListener('click', () => webhookManager.add());
+            dom.webhookUrl.addEventListener('keydown', e => { if (e.key === 'Enter') webhookManager.add(); });
+            dom.testBtn.addEventListener('click', () => webhookManager.test());
+            dom.healthBtn.addEventListener('click', () => webhookManager.health());
+            dom.resetBtn.addEventListener('click', () => webhookManager.reset());
+
+            // Links
+            dom.addLinkBtn.addEventListener('click', () => linkManager.add());
+            dom.linkUrl.addEventListener('keydown', e => { if (e.key === 'Enter') linkManager.add(); });
+            dom.sendLinksBtn.addEventListener('click', () => linkManager.send());
+            dom.clearLinksBtn.addEventListener('click', () => linkManager.clear());
+
+            // Embed
+            dom.embedTitle.addEventListener('input', () => embedManager.updatePreview());
+            dom.embedDesc.addEventListener('input', () => embedManager.updatePreview());
+            dom.embedColor.addEventListener('input', () => embedManager.updatePreview());
+            dom.sendEmbedBtn.addEventListener('click', () => embedManager.sendEmbed());
+            dom.saveTemplateBtn.addEventListener('click', () => embedManager.saveTemplate());
+
+            // Files
+            dom.dropzone.addEventListener('click', () => dom.fileInput.click());
+            dom.dropzone.addEventListener('dragover', e => { e.preventDefault(); dom.dropzone.classList.add('dragover'); });
+            dom.dropzone.addEventListener('dragleave', () => dom.dropzone.classList.remove('dragover'));
+            dom.dropzone.addEventListener('drop', e => { e.preventDefault(); dom.dropzone.classList.remove('dragover'); fileManager.add(e.dataTransfer.files); });
+            dom.fileInput.addEventListener('change', e => { fileManager.add(e.target.files); dom.fileInput.value = ''; });
+            dom.sendFilesBtn.addEventListener('click', () => fileManager.send());
+            dom.clearFilesBtn.addEventListener('click', () => fileManager.clear());
+
+            // Logs
+            dom.downloadLogsBtn.addEventListener('click', () => logManager.download());
+            dom.clearLogsBtn.addEventListener('click', () => logManager.clear());
+
+            // Tabs
+            dom.tabs.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    dom.tabs.forEach(t => t.classList.remove('active'));
+                    btn.classList.add('active');
+                    dom.tabPages.forEach(p => { p.classList.remove('active'); if (p.id === btn.dataset.tab + 'Tab') p.classList.add('active'); });
+                    if (btn.dataset.tab === 'embed') embedManager.updatePreview();
+                });
+            });
+
+            // Mode Toggle
+            dom.modeOpts.forEach(opt => {
+                opt.addEventListener('click', () => {
+                    opt.closest('.mode-toggle').querySelectorAll('.mode-opt').forEach(o => o.classList.remove('active'));
+                    opt.classList.add('active');
+                    state.sendMode = opt.dataset.mode;
+                });
+            });
+
+            // Render
+            webhookManager.render();
+            linkManager.render();
+            fileManager.render();
+            helpers.renderLogs();
+            historyManager.render();
+            embedManager.renderTemplates();
+
+            if (state.webhooks.length) { state.activeWebhook = state.webhooks[0]; webhookManager.render(); }
+            else { helpers.toast('Hoş geldiniz! Webhook ekleyerek başlayın.', 'info'); helpers.log('Uygulama başlatıldı', 'info'); }
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
+
 </html>
